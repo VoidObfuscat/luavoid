@@ -1,89 +1,113 @@
 /**
- * LuaVoid — Roblox Game Picker (local-first, zero CORS issues)
- * games.js
+ * LuaVoid — Roblox Game Picker v3
+ * Uses roproxy.com (CORS-free Roblox API mirror) for real game data + thumbnails
  */
 
-/* ══════════════════════════════════════════════
-   LOCAL DATABASE — 50+ games, no external deps
-══════════════════════════════════════════════ */
-const GAMES_DB = [
-  { name:'Blox Fruits',             id:2753915549,  genre:'RPG/Grinding',    players:'~600K', emoji:'🍎', tags:['rpg','fruits','grinding','pvp','boss','raid','sea','devil fruit','sword','gun'] },
-  { name:'Arsenal',                 id:286090429,   genre:'FPS Shooter',     players:'~80K',  emoji:'🔫', tags:['fps','gun','kill','deathmatch','shooter','knife','skin','crate'] },
-  { name:'Brookhaven RP',           id:4924922222,  genre:'Roleplay',        players:'~400K', emoji:'🏡', tags:['roleplay','rp','house','car','social','drama','school','job'] },
-  { name:'Adopt Me!',               id:223886543,   genre:'Social/Trading',  players:'~300K', emoji:'🐾', tags:['pets','trading','eggs','rare','legendary','baby','neon','fly'] },
-  { name:'Da Hood',                 id:2788229376,  genre:'Shooting/Crime',  players:'~50K',  emoji:'🏙️', tags:['shooting','crime','gang','gun','pvp','hood','cash','wanted'] },
-  { name:'Jailbreak',               id:606849621,   genre:'Open World',      players:'~70K',  emoji:'🚔', tags:['cops','robbers','heist','car','jail','escape','bank','train'] },
-  { name:'Pet Simulator X',         id:6284583030,  genre:'Pet Simulator',   players:'~100K', emoji:'🐶', tags:['pets','gems','eggs','hatch','simulator','coins','world','rainbow'] },
-  { name:'Murder Mystery 2',        id:142823291,   genre:'Mystery',         players:'~60K',  emoji:'🔪', tags:['murder','sheriff','innocent','knife','gun','lobby','round','kill'] },
-  { name:'Tower of Hell',           id:1060560842,  genre:'Obby',            players:'~40K',  emoji:'🗼', tags:['obby','parkour','climb','tower','random','section','fall','speed'] },
-  { name:'Doors',                   id:6516141723,  genre:'Horror',          players:'~50K',  emoji:'🚪', tags:['horror','entity','hotel','rush','ambush','seek','door','floor'] },
-  { name:'Anime Fighting Sim X',    id:1562448805,  genre:'Anime Fighting',  players:'~30K',  emoji:'⚔️', tags:['anime','fighting','awakening','chi','tycoon','simulator','power','chakra'] },
-  { name:'Shindo Life',             id:5283441870,  genre:'Anime RPG',       players:'~40K',  emoji:'🌀', tags:['naruto','shinobi','bloodline','tailed beast','mode','village','pvp','grinding'] },
-  { name:'A Universal Time',        id:4891711857,  genre:'Anime Fighting',  players:'~15K',  emoji:'🕰️', tags:['jojo','stand','time stop','AU','DIO','giorno','requiem','arrow'] },
-  { name:'Wisteria',                id:5280570655,  genre:'Demon Slayer RPG',players:'~10K',  emoji:'🌸', tags:['demon slayer','breathing','hashira','mark','sun','moon','pvp','boss'] },
-  { name:'Funky Friday',            id:5325386581,  genre:'Rhythm',          players:'~20K',  emoji:'🎵', tags:['fnf','rhythm','music','arrow','note','mod','boyfriend','week'] },
-  { name:'Phantom Forces',          id:292439477,   genre:'Military FPS',    players:'~20K',  emoji:'🪖', tags:['fps','tactical','military','gun','rank','team','deathmatch','sniper'] },
-  { name:'BedWars',                 id:6872265039,  genre:'Strategy PVP',    players:'~30K',  emoji:'🛏️', tags:['bedwars','pvp','teams','bed','destroy','rush','diamond','gold'] },
-  { name:'Deepwoken',               id:8899316981,  genre:'RPG Hardcore',    players:'~12K',  emoji:'🌊', tags:['deepwoken','permadeath','attunement','resonance','oath','build','pvp','mantra'] },
-  { name:'King Legacy',             id:5901044556,  genre:'One Piece RPG',   players:'~20K',  emoji:'👑', tags:['one piece','pirate','devil fruit','sea','island','pvp','raid','boss'] },
-  { name:'Fisch',                   id:16732694052, genre:'Fishing',         players:'~40K',  emoji:'🎣', tags:['fishing','fish','ocean','rod','rare','bait','island','variant'] },
-  { name:'Grow a Garden',           id:126884695,   genre:'Farming',         players:'~50K',  emoji:'🌻', tags:['garden','seed','plant','water','harvest','sell','mutation','rare'] },
-  { name:'The Strongest Battlegrounds', id:9551276785, genre:'Anime PVP',   players:'~25K',  emoji:'💥', tags:['one punch','genos','saitama','pvp','combo','flying','meteor','battleground'] },
-  { name:'Untitled Boxing Game',    id:10449761463, genre:'Boxing',          players:'~15K',  emoji:'🥊', tags:['boxing','punch','combo','ranked','style','parry','dodge','stamina'] },
-  { name:'Counter Blox',            id:301549746,   genre:'CS:GO Clone',     players:'~10K',  emoji:'💣', tags:['counter','bomb','plant','defuse','ct','t','headshot','rifle','pistol'] },
-  { name:'Royale High',             id:735030788,   genre:'Dress Up RPG',    players:'~30K',  emoji:'👑', tags:['dress','fashion','school','princess','fairy','wings','gems','exchange'] },
-  { name:'Work at Pizza Place',     id:192800,      genre:'Simulator',       players:'~25K',  emoji:'🍕', tags:['pizza','work','job','oven','delivery','manager','cook','cashier'] },
-  { name:'Natural Disaster Survival',id:189707,     genre:'Survival',        players:'~8K',   emoji:'🌪️', tags:['disaster','flood','volcano','earthquake','tornado','survive','platform'] },
-  { name:'Flee the Facility',       id:152354242,   genre:'Horror Escape',   players:'~15K',  emoji:'🏃', tags:['escape','beast','run','computer','freeze','rescue','hide','facility'] },
-  { name:'Islands',                 id:4412446125,  genre:'Survival Building',players:'~10K', emoji:'🏝️', tags:['island','craft','farm','boss','ore','totem','trading','build'] },
-  { name:'Piggy',                   id:6284583030,  genre:'Horror Escape',   players:'~15K',  emoji:'🐷', tags:['piggy','escape','chapter','trap','clue','key','jumpscare','book'] },
-  { name:'Lumber Tycoon 2',         id:13822889,    genre:'Tycoon',          players:'~10K',  emoji:'🪵', tags:['lumber','wood','axe','money','build','truck','log','sawmill'] },
-  { name:'Dragon Ball Rage',        id:1353235494,  genre:'DBZ RPG',         players:'~5K',   emoji:'🐉', tags:['dragon ball','saiyan','ki','transformation','ssj','saga','power level'] },
-  { name:'Zombie Attack',           id:19204826,    genre:'Zombie Survival', players:'~5K',   emoji:'🧟', tags:['zombie','wave','gun','armor','survive','boss','horde','undead'] },
-  { name:'Entry Point',             id:2427726820,  genre:'Stealth Heist',   players:'~5K',   emoji:'🕵️', tags:['heist','stealth','mask','coop','infiltrate','silencer','guard','bank'] },
-  { name:'Mining Simulator 2',      id:7541320500,  genre:'Mining Simulator',players:'~8K',   emoji:'⛏️', tags:['mining','ore','gem','drill','backpack','world','sell','egg'] },
-  { name:'Frontlines',              id:5765647755,  genre:'Military FPS',    players:'~10K',  emoji:'🪖', tags:['frontlines','military','squad','objective','capture','war','tactical'] },
+const ROPROXY = 'https://games.roproxy.com';
+const THUMBPROXY = 'https://thumbnails.roproxy.com';
+
+/* ── Popular games fallback (shown before search, with known IDs) ── */
+const POPULAR_IDS = [
+  2753915549, 286090429, 4924922222, 223886543, 2788229376, 606849621,
+  6284583030, 142823291, 1060560842, 6516141723, 1562448805, 5283441870,
+  4891711857, 5280570655, 5325386581, 292439477, 6872265039, 8899316981,
+  5901044556, 16732694052, 126884695, 9551276785, 10449761463, 301549746,
+  735030788, 192800, 189707, 152354242, 4412446125, 13822889,
+  7541320500, 1353235494, 19204826, 2427726820, 5765647755,
 ];
 
-/* ══════════════════════════════════════════════
-   SEARCH — pure local, instant, zero API
-══════════════════════════════════════════════ */
-function searchGames(query) {
-  if (!query || !query.trim()) return GAMES_DB.slice(0, 20);
-  const q = query.toLowerCase().trim();
-  const scored = GAMES_DB.map(g => {
-    let score = 0;
-    const nameLow = g.name.toLowerCase();
-    if (nameLow === q)                    score += 100;
-    else if (nameLow.startsWith(q))       score += 60;
-    else if (nameLow.includes(q))         score += 40;
-    if (g.genre.toLowerCase().includes(q)) score += 20;
-    g.tags.forEach(t => { if (t.includes(q)) score += 10; });
-    return { game: g, score };
-  }).filter(x => x.score > 0).sort((a,b) => b.score - a.score);
-  return scored.map(x => x.game).slice(0, 20);
+/* ── In-memory cache ── */
+const _thumbCache = {};
+const _gameCache  = {};
+
+/* ── Fetch thumbnails for a list of universeIds ── */
+async function fetchThumbs(ids) {
+  const needed = ids.filter(id => !_thumbCache[id]);
+  if (!needed.length) return;
+  try {
+    const chunks = [];
+    for (let i = 0; i < needed.length; i += 100) chunks.push(needed.slice(i, i + 100));
+    for (const chunk of chunks) {
+      const url = `${THUMBPROXY}/v1/games/icons?universeIds=${chunk.join(',')}&returnPolicy=PlaceHolder&size=150x150&format=Png&isCircular=false`;
+      const res = await fetch(url, { signal: AbortSignal.timeout(6000) });
+      if (!res.ok) continue;
+      const data = await res.json();
+      (data.data || []).forEach(t => { _thumbCache[t.targetId] = t.imageUrl; });
+    }
+  } catch(e) { /* silent */ }
 }
 
-/* ══════════════════════════════════════════════
-   BUILD GAME CONTEXT (for AI prompts)
-══════════════════════════════════════════════ */
+/* ── Search via roproxy ── */
+async function searchRobloxGames(query) {
+  try {
+    const url = `${ROPROXY}/v1/games/list?model.keyword=${encodeURIComponent(query)}&model.maxRows=24&model.startRows=0&model.sortToken=&model.gameSetTargetId=&model.gameSetTypeId=`;
+    const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    const games = (data.games || []).map(g => ({
+      id:      g.universeId,
+      placeId: g.placeId,
+      name:    g.name,
+      players: g.playerCount || 0,
+      creator: g.creatorName || '',
+      thumb:   null,
+    }));
+    if (games.length) {
+      await fetchThumbs(games.map(g => g.id));
+      games.forEach(g => { g.thumb = _thumbCache[g.id] || null; });
+    }
+    return games;
+  } catch(e) {
+    console.warn('[GamePicker] search error:', e.message);
+    return null;
+  }
+}
+
+/* ── Load popular games ── */
+async function loadPopularGames() {
+  // Get details for popular IDs
+  try {
+    const chunks = [];
+    for (let i = 0; i < POPULAR_IDS.length; i += 50) chunks.push(POPULAR_IDS.slice(i, i + 50));
+    const games = [];
+    for (const chunk of chunks) {
+      const url = `${ROPROXY.replace('games.','')}/v1/games?universeIds=${chunk.join(',')}`;
+      const res = await fetch(url.replace('https://','https://games.roproxy.com').replace('/v1/','/v1/'), { signal: AbortSignal.timeout(8000) });
+      // fallback: just use IDs
+      if (res.ok) {
+        const data = await res.json();
+        (data.data || chunk.map(id => ({id,name:'Loading...',playerCount:0}))).forEach(g => {
+          games.push({ id: g.id || g.universeId, name: g.name || 'Game', players: g.playing || 0, creator: g.creator?.name || '', thumb: null });
+        });
+      } else {
+        chunk.forEach(id => games.push({ id, name: 'Loading...', players: 0, creator: '', thumb: null }));
+      }
+    }
+    await fetchThumbs(POPULAR_IDS);
+    games.forEach(g => { g.thumb = _thumbCache[g.id] || null; });
+    return games;
+  } catch(e) {
+    // Return stubs if API fails
+    return POPULAR_IDS.map(id => ({ id, name: 'Game #' + id, players: 0, creator: '', thumb: null }));
+  }
+}
+
+/* ── Game context builder ── */
 function buildGameContext(game) {
   if (!game) return null;
   return {
-    name:  game.name,
-    genre: game.genre,
-    tags:  game.tags,
-    aiPrefix: `\n[Roblox Game: "${game.name}" | Genre: ${game.genre} | Keywords: ${game.tags.slice(0,8).join(', ')}]\n\n`,
-    acCtx:    `"${game.name}" (${game.genre}) — Tags: ${game.tags.slice(0,6).join(', ')}`,
-    bpCtx:    `Target game: "${game.name}" (${game.genre}) — ${game.tags.slice(0,6).join(', ')}`,
-    aiAntiCheatPrompt: `You are LuaVoid AI. Analyze this Roblox game and generate detection checks for an executor-side anti-cheat script.\n\nGame: "${game.name}"\nGenre: ${game.genre}\nKeywords: ${game.tags.join(', ')}\n\nBased on this game's genre and mechanics, list which cheat detections are most relevant. Output ONLY a JSON object like:\n{"speed":true,"fly":true,"tp":true,"god":false,"aimbot":true,"noclip":false,"hitbox":true,"remoteSpam":false,"reason":"<one sentence why these cheats are common in this game type>"}\n\nOutput ONLY the JSON, no markdown, no explanation.`,
+    name:   game.name,
+    aiPrefix: `\n[Roblox Game: "${game.name}"${game.creator?' by '+game.creator:''}${game.players?' | '+game.players.toLocaleString()+' online':''}]\n\n`,
+    acCtx:    `"${game.name}"${game.creator?' by '+game.creator:''}`,
+    bpCtx:    `Target: "${game.name}"`,
+    aiAntiCheatPrompt: `You are LuaVoid AI, a Roblox anti-cheat expert. Analyze the game "${game.name}"${game.creator?' by '+game.creator:''} and determine which executor-side cheat detections are most useful.\n\nOutput ONLY this exact JSON (no markdown, no extra text):\n{"speed":true,"fly":true,"tp":true,"god":false,"aimbot":false,"noclip":false,"hitbox":false,"remoteSpam":false,"jump":true,"reason":"one sentence explaining why"}`,
   };
 }
 
 /* ══════════════════════════════════════════════
    GAME PICKER UI
 ══════════════════════════════════════════════ */
-(function initGamePicker() {
+(function initPicker() {
   const wrap        = document.getElementById('game-picker-wrap');
   const btn         = document.getElementById('game-picker-btn');
   const dropdown    = document.getElementById('game-dropdown');
@@ -105,64 +129,85 @@ function buildGameContext(game) {
 
   if (!wrap) return;
 
-  let isOpen = false, selected = null, ctx = null;
+  let isOpen = false, selected = null, ctx = null, searchTO = null, popularLoaded = false;
 
-  /* ── Open / Close ── */
+  /* ── Open/Close ── */
   function open() {
     isOpen = true;
     dropdown.classList.add('open');
     btn.classList.add('active');
     searchInput.focus();
-    render('');
+    if (!popularLoaded) { popularLoaded = true; loadAndRender(); }
   }
   function close() {
     isOpen = false;
     dropdown.classList.remove('open');
     btn.classList.remove('active');
   }
-
   btn.addEventListener('click', e => { e.stopPropagation(); isOpen ? close() : open(); });
   document.addEventListener('click', e => { if (!wrap.contains(e.target)) close(); });
   dropdown.addEventListener('click', e => e.stopPropagation());
 
+  /* ── Load popular ── */
+  async function loadAndRender() {
+    setStatus('loading', 'Loading popular games...');
+    const games = await loadPopularGames();
+    statusEl.style.display = 'none';
+    renderGames(games, false);
+  }
+
   /* ── Search ── */
   searchInput.addEventListener('input', () => {
-    const q = searchInput.value;
+    const q = searchInput.value.trim();
     clearBtn.style.display = q ? 'block' : 'none';
-    render(q);
+    clearTimeout(searchTO);
+    if (!q) { loadAndRender(); return; }
+    setStatus('loading', 'Searching all Roblox games...');
+    resultsEl.innerHTML = '';
+    searchTO = setTimeout(async () => {
+      const games = await searchRobloxGames(q);
+      if (games === null) {
+        setStatus('error', 'Search failed. Check connection.');
+        return;
+      }
+      if (!games.length) {
+        setStatus('normal', `No results for "${esc(q)}"`);
+        return;
+      }
+      statusEl.style.display = 'none';
+      renderGames(games, false);
+    }, 500);
   });
+
   clearBtn.addEventListener('click', () => {
     searchInput.value = '';
     clearBtn.style.display = 'none';
-    render('');
+    loadAndRender();
     searchInput.focus();
   });
 
-  /* ── Render results ── */
-  function render(query) {
-    const games = searchGames(query);
-    statusEl.style.display = 'none';
-    resultsEl.innerHTML    = '';
-    if (!games.length) {
-      statusEl.style.display = 'flex';
-      statusEl.innerHTML = `<i class="fa-solid fa-magnifying-glass"></i> No games found for "${esc(query)}"`;
-      return;
-    }
+  /* ── Render list ── */
+  function renderGames(games, append) {
+    if (!append) resultsEl.innerHTML = '';
     games.forEach(g => {
       const item = document.createElement('div');
       item.className = 'gd-result-item' + (selected?.id === g.id ? ' selected' : '');
+
+      const thumbHTML = g.thumb
+        ? `<img src="${g.thumb}" alt="" loading="lazy" onerror="this.style.display='none';this.nextSibling.style.display='flex'" /><div class="gri-fallback" style="display:none"><i class="fa-brands fa-roblox"></i></div>`
+        : `<div class="gri-fallback"><i class="fa-brands fa-roblox"></i></div>`;
+
+      const online = g.players ? `<span class="online"><i class="fa-solid fa-circle" style="font-size:.35rem"></i> ${fmtN(g.players)}</span>` : '';
+      const creator = g.creator ? `<span>${esc(g.creator)}</span>` : '';
+
       item.innerHTML = `
-        <div class="gri-thumb">
-          <div class="gri-thumb-emoji">${g.emoji}</div>
-        </div>
+        <div class="gri-thumb">${thumbHTML}</div>
         <div class="gri-info">
           <div class="gri-name">${esc(g.name)}</div>
-          <div class="gri-meta">
-            <span class="online"><i class="fa-solid fa-circle" style="font-size:.4rem"></i>${esc(g.players)}</span>
-            <span>${esc(g.genre)}</span>
-          </div>
+          <div class="gri-meta">${online}${creator}</div>
         </div>
-        <button class="gri-select-btn">Select</button>`;
+        <button class="gri-select-btn">Use</button>`;
+
       const doSel = () => selectGame(g);
       item.querySelector('.gri-select-btn').addEventListener('click', e => { e.stopPropagation(); doSel(); });
       item.addEventListener('click', doSel);
@@ -175,19 +220,27 @@ function buildGameContext(game) {
     selected = game;
     ctx      = buildGameContext(game);
 
-    // Nav button
-    gpbThumb.innerHTML   = `<span style="font-size:1.1rem">${game.emoji}</span>`;
+    if (game.thumb) {
+      gpbThumb.innerHTML = `<img src="${game.thumb}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:6px" onerror="this.parentElement.innerHTML='<i class=\\"fa-brands fa-roblox\\" style=\\"color:#e8362a\\"></i>'" />`;
+    } else {
+      gpbThumb.innerHTML = `<i class="fa-brands fa-roblox" style="color:#e8362a"></i>`;
+    }
     gpbLabel.textContent = game.name.length > 16 ? game.name.slice(0,14)+'…' : game.name;
-    gpbSub.textContent   = game.genre;
+    gpbSub.textContent   = game.creator ? 'by '+game.creator : 'Context active';
 
-    // Preview
     previewEl.style.display = 'block';
-    gdspImg.style.display   = 'none';
-    gdspName.textContent    = `${game.emoji} ${game.name}`;
-    gdspMeta.innerHTML      = `<span class="online"><i class="fa-solid fa-circle" style="font-size:.4rem"></i>${esc(game.players)}</span><span>${esc(game.genre)}</span>`;
-    gdspDesc.textContent    = game.tags.slice(0,10).join(' · ');
+    gdspName.textContent    = game.name;
+    gdspMeta.innerHTML      = (game.players?`<span class="online"><i class="fa-solid fa-circle" style="font-size:.35rem"></i> ${fmtN(game.players)} online</span>`:'') + (game.creator?`<span>by ${esc(game.creator)}</span>`:'');
+    gdspDesc.textContent    = '';
 
-    // Highlight in list
+    if (game.thumb) {
+      gdspImg.src           = game.thumb;
+      gdspImg.style.display = 'block';
+      gdspImg.onerror       = () => { gdspImg.style.display = 'none'; };
+    } else {
+      gdspImg.style.display = 'none';
+    }
+
     document.querySelectorAll('.gd-result-item').forEach(el => {
       el.classList.toggle('selected', el.querySelector('.gri-name')?.textContent === game.name);
     });
@@ -201,31 +254,25 @@ function buildGameContext(game) {
     const p = document.getElementById('ai-prompt');
     if (p && !p.value.includes(ctx.name)) p.value = ctx.aiPrefix + p.value;
     close(); if (window.switchTab) switchTab('aiscript');
-    if (typeof toast === 'function') toast(`"${selected.name}" context added to AI!`, 'success');
+    if (typeof toast === 'function') toast(`"${selected.name}" added to AI context`, 'success');
   });
-
   applyAc?.addEventListener('click', () => {
     if (!ctx) return;
     const n = document.getElementById('ac-game-name');
     if (n) n.value = selected.name;
     close(); if (window.switchTab) switchTab('anticheat');
-    // Auto-analyze with AI if key available
-    setTimeout(() => {
-      const analyzeBtn = document.getElementById('ac-ai-analyze');
-      if (analyzeBtn) analyzeBtn.click();
-    }, 300);
-    if (typeof toast === 'function') toast(`"${selected.name}" → Anti-Cheat! AI analyzing...`, 'success');
+    setTimeout(() => { document.getElementById('ac-ai-analyze')?.click(); }, 400);
+    if (typeof toast === 'function') toast(`"${selected.name}" → Anti-Cheat AI analyzing...`, 'info');
   });
-
   applyBp?.addEventListener('click', () => {
     if (!ctx) return;
     const n = document.getElementById('bp-game-name');
     if (n) n.value = selected.name;
     close(); if (window.switchTab) switchTab('bypass');
-    if (typeof toast === 'function') toast(`"${selected.name}" context added to Bypass!`, 'success');
+    if (typeof toast === 'function') toast(`"${selected.name}" added to Bypass`, 'success');
   });
 
-  /* ── Context banners ── */
+  /* ── Banners ── */
   function updateBanners() {
     if (!selected) return;
     ['obfuscator','aiscript','anticheat','bypass'].forEach(pid => {
@@ -236,13 +283,14 @@ function buildGameContext(game) {
       if (!body) return;
       const b = document.createElement('div');
       b.className = 'game-context-banner';
+      const tHTML = selected.thumb ? `<img src="${selected.thumb}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:5px" />` : '';
       b.innerHTML = `
-        <div class="gcb-thumb" style="font-size:1.4rem;display:flex;align-items:center;justify-content:center">${selected.emoji}</div>
+        <div class="gcb-thumb">${tHTML}</div>
         <div class="gcb-info">
           <div class="gcb-label"><i class="fa-brands fa-roblox"></i> Game Context Active</div>
-          <div class="gcb-name">${esc(selected.name)} — ${esc(selected.genre)}</div>
+          <div class="gcb-name">${esc(selected.name)}</div>
         </div>
-        <button class="gcb-clear" title="Clear context"><i class="fa-solid fa-xmark"></i></button>`;
+        <button class="gcb-clear"><i class="fa-solid fa-xmark"></i></button>`;
       b.querySelector('.gcb-clear').addEventListener('click', clearCtx);
       body.insertBefore(b, body.firstChild);
     });
@@ -257,10 +305,17 @@ function buildGameContext(game) {
     document.querySelectorAll('.game-context-banner').forEach(b => b.remove());
   }
 
+  /* ── Utils ── */
+  function setStatus(type, msg) {
+    statusEl.style.display = 'flex';
+    resultsEl.innerHTML    = '';
+    const icons = { loading:'fa-spinner fa-spin', normal:'fa-magnifying-glass', error:'fa-triangle-exclamation' };
+    statusEl.innerHTML = `<i class="fa-solid ${icons[type]||icons.normal}"></i> ${msg}`;
+    statusEl.style.color = type==='error' ? 'var(--red)' : '';
+  }
   function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function fmtN(n) { if(n>=1e6) return (n/1e6).toFixed(1)+'M'; if(n>=1e3) return (n/1e3).toFixed(0)+'K'; return String(n); }
 
-  /* ── Expose globally ── */
   window.getGameContext  = () => ctx;
   window.getSelectedGame = () => selected;
-
 })();
