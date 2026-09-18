@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LuaVoid — Professional Lua Script Hub</title>
+  <meta name="description" content="LuaVoid — Professional Lua obfuscator, deobfuscator and script hub for Roblox executors." />
+  <meta name="theme-color" content="#7c5af5" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%237c5af5'/%3E%3Ctext x='50%25' y='55%25' font-size='16' font-weight='bold' text-anchor='middle' dominant-baseline='central' fill='white' font-family='monospace'%3ELV%3C/text%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════
+       WELCOME / SPLASH SCREEN
+  ═══════════════════════════════════ -->
+  <div id="welcome-screen" class="welcome-screen">
+    <canvas id="welcome-canvas"></canvas>
+    <div class="welcome-content">
+      <div class="welcome-logo">
+        <div class="welcome-logo-icon">
+          <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 4L36 13V27L20 36L4 27V13L20 4Z" fill="url(#grad1)" opacity="0.9"/>
+            <path d="M14 16L20 13L26 16V22L20 25L14 22V16Z" fill="white" opacity="0.95"/>
+            <defs>
+              <linearGradient id="grad1" x1="4" y1="4" x2="36" y2="36">
+                <stop offset="0%" stop-color="#7c5af5"/>
+                <stop offset="100%" stop-color="#22d3ee"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <div class="welcome-logo-text">
+          <span class="wl-name">Lua<span>Void</span></span>
+          <span class="wl-version">v3.0 Professional</span>
+        </div>
+      </div>
+
+      <div class="welcome-tagline">
+        <span class="wt-line" id="wt-typed"></span><span class="wt-cursor">|</span>
+      </div>
+
+      <div class="welcome-loader">
+        <div class="wl-bar-track">
+          <div class="wl-bar-fill" id="wl-bar"></div>
+        </div>
+        <div class="wl-status" id="wl-status">Initializing engine...</div>
+      </div>
+
+      <div class="welcome-features">
+        <div class="wf-item" id="wf-1">
+          <i class="fa-solid fa-shield-halved"></i>
+          <span>Obfuscator</span>
+        </div>
+        <div class="wf-item" id="wf-2">
+          <i class="fa-solid fa-unlock"></i>
+          <span>Deobfuscator</span>
+        </div>
+        <div class="wf-item" id="wf-3">
+          <i class="fa-brands fa-roblox"></i>
+          <span>Script Hub</span>
+        </div>
+        <div class="wf-item" id="wf-4">
+          <i class="fa-solid fa-wand-magic-sparkles"></i>
+          <span>AI Generator</span>
+        </div>
+        <div class="wf-item" id="wf-5">
+          <i class="fa-solid fa-shield-virus"></i>
+          <span>Anti-Cheat</span>
+        </div>
+      </div>
+
+      <button class="welcome-enter-btn" id="welcome-enter" style="display:none">
+        <span>Enter LuaVoid</span>
+        <i class="fa-solid fa-arrow-right"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════
+       MAIN APP
+  ═══════════════════════════════════ -->
+  <div id="main-app" class="main-app hidden">
+
+    <!-- NAVBAR -->
+    <nav class="navbar" id="navbar">
+      <div class="nav-inner">
+        <!-- Logo -->
+        <a href="#" class="nav-logo" id="nav-logo">
+          <div class="nav-logo-icon">
+            <svg viewBox="0 0 28 28" fill="none">
+              <path d="M14 2L26 9V19L14 26L2 19V9L14 2Z" fill="url(#ng1)"/>
+              <path d="M10 11L14 9L18 11V15L14 17L10 15V11Z" fill="white" opacity="0.95"/>
+              <defs>
+                <linearGradient id="ng1" x1="2" y1="2" x2="26" y2="26">
+                  <stop offset="0%" stop-color="#7c5af5"/>
+                  <stop offset="100%" stop-color="#22d3ee"/>
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+          <span>Lua<strong>Void</strong></span>
+        </a>
+
+        <!-- Tab Navigation -->
+        <div class="nav-tabs" id="nav-tabs">
+          <button class="nav-tab active" data-tab="obfuscator">
+            <i class="fa-solid fa-shield-halved"></i>
+            <span>Obfuscator</span>
+            <div class="nav-tab-indicator"></div>
+          </button>
+          <button class="nav-tab" data-tab="deobfuscator">
+            <i class="fa-solid fa-unlock-keyhole"></i>
+            <span>Deobfuscator</span>
+            <div class="nav-tab-indicator"></div>
+          </button>
+          <button class="nav-tab" data-tab="scripthub">
+            <i class="fa-brands fa-roblox"></i>
+            <span>Script Hub</span>
+            <div class="nav-tab-indicator"></div>
+          </button>
+          <button class="nav-tab" data-tab="aiscript">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            <span>AI Script</span>
+            <div class="nav-tab-indicator"></div>
+          </button>
+          <button class="nav-tab" data-tab="anticheat">
+            <i class="fa-solid fa-shield-virus"></i>
+            <span>Anti-Cheat</span>
+            <div class="nav-tab-indicator"></div>
+          </button>
+          <button class="nav-tab" data-tab="bypass">
+            <i class="fa-solid fa-ghost"></i>
+            <span>Bypass</span>
+            <div class="nav-tab-indicator"></div>
+          </button>
+        </div>
+
+        <!-- Right side -->
+        <div class="nav-right">
+          <div class="credits-display" id="credits-display">
+            <i class="fa-solid fa-bolt"></i>
+            <span id="credits-count">100</span>
+            <span class="credits-label">credits</span>
+          </div>
+          <div class="nav-badge">
+            <span class="nb-dot"></span>
+            <span>Roblox Ready</span>
+          </div>
+          <button class="hamburger" id="hamburger">
+            <span></span><span></span><span></span>
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- MOBILE TAB BAR -->
+    <div class="mobile-tabbar" id="mobile-tabbar">
+      <button class="mtab active" data-tab="obfuscator">
+        <i class="fa-solid fa-shield-halved"></i><span>Obfuscate</span>
+      </button>
+      <button class="mtab" data-tab="deobfuscator">
+        <i class="fa-solid fa-unlock-keyhole"></i><span>Deobfuscate</span>
+      </button>
+      <button class="mtab" data-tab="scripthub">
+        <i class="fa-brands fa-roblox"></i><span>Hub</span>
+      </button>
+      <button class="mtab" data-tab="aiscript">
+        <i class="fa-solid fa-wand-magic-sparkles"></i><span>AI</span>
+      </button>
+      <button class="mtab" data-tab="anticheat">
+        <i class="fa-solid fa-shield-virus"></i><span>Anti-Cheat</span>
+      </button>
+      <button class="mtab" data-tab="bypass">
+        <i class="fa-solid fa-ghost"></i><span>Bypass</span>
+      </button>
+    </div>
+
+    <!-- PANELS CONTAINER -->
+    <div class="panels-wrap" id="panels-wrap">
+
+      <!-- ═══ PANEL: OBFUSCATOR ═══ -->
+      <section class="panel active" id="panel-obfuscator" data-panel="obfuscator">
+        <div class="panel-hero">
+          <div class="panel-hero-bg"></div>
+          <div class="panel-hero-content">
+            <div class="panel-badge purple">
+              <i class="fa-solid fa-shield-halved"></i> Lua Obfuscator
+            </div>
+            <h1>Protect Your <span class="gtext">Lua Scripts</span></h1>
+            <p>Multi-layer obfuscation with full Roblox executor compatibility.</p>
+          </div>
+        </div>
+
+        <div class="panel-body">
+
+          <!-- Protection Options -->
+          <div class="card options-card">
+            <div class="card-header">
+              <div class="card-title">
+                <i class="fa-solid fa-sliders"></i> Protection Layers
+              </div>
+              <div class="preset-btns">
+                <button class="preset-btn" id="preset-light">Light</button>
+                <button class="preset-btn active" id="preset-medium">Medium</button>
+                <button class="preset-btn" id="preset-max">Maximum</button>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="toggles-grid">
+                <label class="toggle-row">
+                  <div class="toggle-switch">
+                    <input type="checkbox" id="opt-rename" checked />
+                    <span class="ts-track"><span class="ts-thumb"></span></span>
+                  </div>
+                  <div class="toggle-info">
+                    <span class="ti-name">Variable Renaming</span>
+                    <span class="ti-desc">Rename vars to random identifiers</span>
+                  </div>
+                  <span class="ti-badge purple">Core</span>
+                </label>
+                <label class="toggle-row">
+                  <div class="toggle-switch">
+                    <input type="checkbox" id="opt-strings" checked />
+                    <span class="ts-track"><span class="ts-thumb"></span></span>
+                  </div>
+                  <div class="toggle-info">
+                    <span class="ti-name">String Encryption</span>
+                    <span class="ti-desc">Encode strings to byte arrays</span>
+                  </div>
+                  <span class="ti-badge blue">Core</span>
+                </label>
+                <label class="toggle-row">
+                  <div class="toggle-switch">
+                    <input type="checkbox" id="opt-junk" checked />
+                    <span class="ts-track"><span class="ts-thumb"></span></span>
+                  </div>
+                  <div class="toggle-info">
+                    <span class="ti-name">Junk Injection</span>
+                    <span class="ti-desc">Insert dead code to confuse decompilers</span>
+                  </div>
+                  <span class="ti-badge green">Core</span>
+                </label>
+                <label class="toggle-row">
+                  <div class="toggle-switch">
+                    <input type="checkbox" id="opt-comments" checked />
+                    <span class="ts-track"><span class="ts-thumb"></span></span>
+                  </div>
+                  <div class="toggle-info">
+                    <span class="ti-name">Strip Comments</span>
+                    <span class="ti-desc">Remove all comment lines</span>
+                  </div>
+                  <span class="ti-badge cyan">Core</span>
+                </label>
+                <label class="toggle-row">
+                  <div class="toggle-switch">
+                    <input type="checkbox" id="opt-numbers" />
+                    <span class="ts-track"><span class="ts-thumb"></span></span>
+                  </div>
+                  <div class="toggle-info">
+                    <span class="ti-name">Number Encoding</span>
+                    <span class="ti-desc">Transform numeric literals</span>
+                  </div>
+                  <span class="ti-badge orange">Extra</span>
+                </label>
+                <label class="toggle-row">
+                  <div class="toggle-switch">
+                    <input type="checkbox" id="opt-flatten" />
+                    <span class="ts-track"><span class="ts-thumb"></span></span>
+                  </div>
+                  <div class="toggle-info">
+                    <span class="ti-name">Flow Flattening</span>
+                    <span class="ti-desc">Flatten control flow with dispatcher</span>
+                  </div>
+                  <span class="ti-badge red">Heavy</span>
+                </label>
+                <label class="toggle-row">
+                  <div class="toggle-switch">
+                    <input type="checkbox" id="opt-compress" />
+                    <span class="ts-track"><span class="ts-thumb"></span></span>
+                  </div>
+                  <div class="toggle-info">
+                    <span class="ti-name">Minify Output</span>
+                    <span class="ti-desc">Compress to a single line</span>
+                  </div>
+                  <span class="ti-badge gray">Util</span>
+                </label>
+                <label class="toggle-row">
+                  <div class="toggle-switch">
+                    <input type="checkbox" id="opt-roblox-wrap" checked />
+                    <span class="ts-track"><span class="ts-thumb"></span></span>
+                  </div>
+                  <div class="toggle-info">
+                    <span class="ti-name">Roblox pcall Wrap</span>
+                    <span class="ti-desc">Safe execution on all executors</span>
+                  </div>
+                  <span class="ti-badge roblox"><i class="fa-brands fa-roblox"></i></span>
+                </label>
+                <label class="toggle-row">
+                  <div class="toggle-switch">
+                    <input type="checkbox" id="opt-watermark" />
+                    <span class="ts-track"><span class="ts-thumb"></span></span>
+                  </div>
+                  <div class="toggle-info">
+                    <span class="ti-name">LuaVoid Watermark</span>
+                    <span class="ti-desc">Add signature to the output</span>
+                  </div>
+                  <span class="ti-badge gray">Util</span>
+                </label>
+              </div>
+
+              <!-- Intensity -->
+              <div class="intensity-wrap">
+                <div class="intensity-header">
+                  <span><i class="fa-solid fa-gauge-high"></i> Junk Intensity</span>
+                  <div class="intensity-levels">
+                    <span class="il" data-v="2">Low</span>
+                    <span class="il active" data-v="5">Medium</span>
+                    <span class="il" data-v="8">High</span>
+                    <span class="il" data-v="10">Max</span>
+                  </div>
+                </div>
+                <div class="intensity-slider-wrap">
+                  <input type="range" id="junk-intensity" min="1" max="10" value="5" />
+                  <div class="intensity-track-fill" id="intensity-fill"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Editor -->
+          <div class="editor-container">
+            <!-- Input -->
+            <div class="editor-card">
+              <div class="editor-top">
+                <div class="editor-label">
+                  <span class="editor-dot input-dot"></span>
+                  Input Script
+                </div>
+                <div class="editor-actions">
+                  <button class="ea-btn" id="btn-sample"><i class="fa-solid fa-flask-vial"></i> Sample</button>
+                  <button class="ea-btn" id="btn-clear-input"><i class="fa-solid fa-eraser"></i> Clear</button>
+                </div>
+              </div>
+              <div class="editor-wrap">
+                <div class="line-numbers" id="ln-input"></div>
+                <textarea id="input-code" class="code-area" spellcheck="false"
+                  placeholder="-- Paste your Lua script here..."></textarea>
+              </div>
+              <div class="editor-footer">
+                <span id="input-stats">0 lines · 0 chars</span>
+                <span class="ef-hint"><kbd>Ctrl</kbd>+<kbd>Enter</kbd> to obfuscate</span>
+              </div>
+            </div>
+
+            <!-- Center -->
+            <div class="editor-center">
+              <button class="obf-btn" id="btn-obfuscate">
+                <div class="obf-btn-inner">
+                  <i class="fa-solid fa-shield-halved"></i>
+                  <span>Obfuscate</span>
+                </div>
+                <svg class="obf-ring" viewBox="0 0 50 50">
+                  <circle cx="25" cy="25" r="20" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="3"/>
+                  <circle id="obf-ring-fill" cx="25" cy="25" r="20" fill="none" stroke="white" stroke-width="3"
+                    stroke-dasharray="125.6" stroke-dashoffset="125.6" stroke-linecap="round"/>
+                </svg>
+              </button>
+              <button class="swap-btn" id="btn-swap">
+                <i class="fa-solid fa-right-left"></i>
+              </button>
+            </div>
+
+            <!-- Output -->
+            <div class="editor-card output-card">
+              <div class="editor-top">
+                <div class="editor-label">
+                  <span class="editor-dot output-dot"></span>
+                  Output — Obfuscated
+                </div>
+                <div class="editor-actions">
+                  <button class="ea-btn success" id="btn-copy"><i class="fa-solid fa-copy"></i> Copy</button>
+                  <button class="ea-btn" id="btn-download"><i class="fa-solid fa-download"></i> .lua</button>
+                  <button class="ea-btn accent" id="btn-send-hub"><i class="fa-brands fa-roblox"></i> → Hub</button>
+                </div>
+              </div>
+              <div class="editor-wrap">
+                <div class="line-numbers" id="ln-output"></div>
+                <textarea id="output-code" class="code-area output-area" readonly spellcheck="false"
+                  placeholder="-- Obfuscated output will appear here..."></textarea>
+              </div>
+              <div class="editor-footer">
+                <span id="output-stats">0 lines · 0 chars</span>
+                <span id="obf-protected" class="ef-protected" style="display:none">
+                  <i class="fa-solid fa-shield-check"></i> Protected
+                </span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ═══ PANEL: DEOBFUSCATOR ═══ -->
+      <section class="panel" id="panel-deobfuscator" data-panel="deobfuscator">
+        <div class="panel-hero">
+          <div class="panel-hero-bg deobf-bg"></div>
+          <div class="panel-hero-content">
+            <div class="panel-badge cyan">
+              <i class="fa-solid fa-unlock-keyhole"></i> Lua Deobfuscator
+            </div>
+            <h1>Analyze &amp; <span class="gtext-cyan">Decode</span> Scripts</h1>
+            <p>Reverse string encryption, decode byte arrays and clean up obfuscated code.</p>
+          </div>
+        </div>
+
+        <div class="panel-body">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <i class="fa-solid fa-magnifying-glass-chart"></i> Deobfuscation Options
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="toggles-grid">
+                <label class="toggle-row">
+                  <div class="toggle-switch">
+                    <input type="checkbox" id="deob-strings" checked />
+                    <span class="ts-track"><span class="ts-thumb"></span></span>
+                  </div>
+                  <div class="toggle-info">
+                    <span class="ti-name">Decode string.char()</span>
+                    <span class="ti-desc">Convert byte arrays back to strings</span>
+                  </div>
+                  <span class="ti-badge cyan">Main</span>
+                </label>
+                <label class="toggle-row">
+                  <div class="toggle-switch">
+                    <input type="checkbox" id="deob-numbers" checked />
+                    <span class="ts-track"><span class="ts-thumb"></span></span>
+                  </div>
+                  <div class="toggle-info">
+                    <span class="ti-name">Simplify Expressions</span>
+                    <span class="ti-desc">Evaluate simple math expressions</span>
+                  </div>
+                  <span class="ti-badge blue">Main</span>
+                </label>
+                <label class="toggle-row">
+                  <div class="toggle-switch">
+                    <input type="checkbox" id="deob-junk" checked />
+                    <span class="ts-track"><span class="ts-thumb"></span></span>
+                  </div>
+                  <div class="toggle-info">
+                    <span class="ti-name">Remove Dead Code</span>
+                    <span class="ti-desc">Strip obvious junk injections</span>
+                  </div>
+                  <span class="ti-badge green">Clean</span>
+                </label>
+                <label class="toggle-row">
+                  <div class="toggle-switch">
+                    <input type="checkbox" id="deob-format" checked />
+                    <span class="ts-track"><span class="ts-thumb"></span></span>
+                  </div>
+                  <div class="toggle-info">
+                    <span class="ti-name">Re-format Code</span>
+                    <span class="ti-desc">Add indentation and line breaks</span>
+                  </div>
+                  <span class="ti-badge gray">Style</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Editor -->
+          <div class="editor-container">
+            <div class="editor-card">
+              <div class="editor-top">
+                <div class="editor-label">
+                  <span class="editor-dot output-dot"></span>
+                  Obfuscated Input
+                </div>
+                <div class="editor-actions">
+                  <button class="ea-btn" id="btn-deob-clear"><i class="fa-solid fa-eraser"></i> Clear</button>
+                </div>
+              </div>
+              <div class="editor-wrap">
+                <div class="line-numbers" id="ln-deob-in"></div>
+                <textarea id="deob-input" class="code-area" spellcheck="false"
+                  placeholder="-- Paste obfuscated Lua code here..."></textarea>
+              </div>
+              <div class="editor-footer">
+                <span id="deob-input-stats">0 lines · 0 chars</span>
+              </div>
+            </div>
+
+            <div class="editor-center">
+              <button class="obf-btn deobf-btn" id="btn-deobfuscate">
+                <div class="obf-btn-inner">
+                  <i class="fa-solid fa-unlock-keyhole"></i>
+                  <span>Decode</span>
+                </div>
+                <svg class="obf-ring" viewBox="0 0 50 50">
+                  <circle cx="25" cy="25" r="20" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="3"/>
+                  <circle id="deobf-ring-fill" cx="25" cy="25" r="20" fill="none" stroke="white" stroke-width="3"
+                    stroke-dasharray="125.6" stroke-dashoffset="125.6" stroke-linecap="round"/>
+                </svg>
+              </button>
+            </div>
+
+            <div class="editor-card output-card">
+              <div class="editor-top">
+                <div class="editor-label">
+                  <span class="editor-dot input-dot"></span>
+                  Decoded Output
+                </div>
+                <div class="editor-actions">
+                  <button class="ea-btn success" id="btn-deob-copy"><i class="fa-solid fa-copy"></i> Copy</button>
+                  <button class="ea-btn" id="btn-deob-download"><i class="fa-solid fa-download"></i> .lua</button>
+                </div>
+              </div>
+              <div class="editor-wrap">
+                <div class="line-numbers" id="ln-deob-out"></div>
+                <textarea id="deob-output" class="code-area output-area" readonly spellcheck="false"
+                  placeholder="-- Decoded output will appear here..."></textarea>
+              </div>
+              <div class="editor-footer">
+                <span id="deob-output-stats">0 lines · 0 chars</span>
+                <span id="deob-info" class="ef-info" style="display:none">
+                  <i class="fa-solid fa-circle-info"></i> Partial decode
+                </span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ═══ PANEL: SCRIPT HUB ═══ -->
+      <section class="panel" id="panel-scripthub" data-panel="scripthub">
+        <div class="panel-hero">
+          <div class="panel-hero-bg hub-bg"></div>
+          <div class="panel-hero-content">
+            <div class="panel-badge roblox-badge">
+              <i class="fa-brands fa-roblox"></i> Script Hub
+            </div>
+            <h1>Generate Your <span class="gtext-orange">loadstring</span></h1>
+            <p>Paste your script, get an instant loadstring ready for any Roblox executor.</p>
+          </div>
+        </div>
+
+        <div class="panel-body hub-body">
+
+          <!-- Left col: input + options -->
+          <div class="hub-left">
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">
+                  <i class="fa-solid fa-file-code"></i> Your Script
+                </div>
+                <div class="editor-actions">
+                  <button class="ea-btn" id="hub-load-from-obf">
+                    <i class="fa-solid fa-arrow-left"></i> From Obfuscator
+                  </button>
+                  <button class="ea-btn" id="hub-clear-script">
+                    <i class="fa-solid fa-eraser"></i> Clear
+                  </button>
+                </div>
+              </div>
+              <div class="card-body p0">
+                <div class="editor-wrap" style="min-height:280px">
+                  <div class="line-numbers" id="ln-hub"></div>
+                  <textarea id="hub-script" class="code-area" spellcheck="false"
+                    placeholder="-- Paste or type your Lua script here...&#10;-- The loadstring will be generated automatically."></textarea>
+                </div>
+                <div class="editor-footer px">
+                  <span id="hub-script-stats">0 lines · 0 chars</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="card" style="margin-top:1.25rem">
+              <div class="card-header">
+                <div class="card-title"><i class="fa-solid fa-gear"></i> Options</div>
+              </div>
+              <div class="card-body">
+                <div class="hub-form-row">
+                  <div class="hub-field">
+                    <label class="hub-field-label"><i class="fa-solid fa-tag"></i> Script Name</label>
+                    <input type="text" id="hub-name" class="hub-input" placeholder="MyAimbot, AutoFarm..." maxlength="40" />
+                  </div>
+                  <div class="hub-field">
+                    <label class="hub-field-label"><i class="fa-solid fa-user"></i> Author</label>
+                    <input type="text" id="hub-author" class="hub-input" placeholder="YourNick..." maxlength="30" />
+                  </div>
+                </div>
+                <div class="hub-checks-row">
+                  <label class="hc-item">
+                    <input type="checkbox" id="hub-obfuscate" checked />
+                    <span class="hc-box"></span>
+                    <span>Obfuscate before publishing</span>
+                  </label>
+                  <label class="hc-item">
+                    <input type="checkbox" id="hub-pcall" checked />
+                    <span class="hc-box"></span>
+                    <span>Wrap in pcall (Roblox safe)</span>
+                  </label>
+                </div>
+                <button class="generate-btn" id="hub-generate">
+                  <i class="fa-solid fa-bolt"></i>
+                  Generate loadstring
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right col: output -->
+          <div class="hub-right">
+            <!-- Empty state -->
+            <div class="hub-empty" id="hub-empty">
+              <div class="hub-empty-icon">
+                <i class="fa-brands fa-roblox"></i>
+              </div>
+              <h3>Ready to generate</h3>
+              <p>Paste your script on the left and click <strong>Generate loadstring</strong></p>
+              <div class="hub-empty-steps">
+                <div class="hes-item">
+                  <span class="hes-num">1</span>
+                  <span>Paste your Lua script</span>
+                </div>
+                <div class="hes-item">
+                  <span class="hes-num">2</span>
+                  <span>Set name &amp; options</span>
+                </div>
+                <div class="hes-item">
+                  <span class="hes-num">3</span>
+                  <span>Click Generate</span>
+                </div>
+                <div class="hes-item">
+                  <span class="hes-num">4</span>
+                  <span>Copy loadstring → executor</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Result (hidden until generated) -->
+            <div class="hub-result" id="hub-result" style="display:none">
+              <div class="hub-result-banner">
+                <div class="hrb-icon"><i class="fa-solid fa-circle-check"></i></div>
+                <div>
+                  <div class="hrb-title" id="hrb-title">Script ready!</div>
+                  <div class="hrb-sub">Your loadstring is below — paste it in your Roblox executor</div>
+                </div>
+                <button class="hrb-new" id="hub-new">
+                  <i class="fa-solid fa-plus"></i> New
+                </button>
+              </div>
+
+              <!-- Loadstring block -->
+              <div class="hub-ls-block">
+                <div class="hub-ls-header">
+                  <div class="hub-ls-title">
+                    <i class="fa-brands fa-roblox"></i>
+                    loadstring
+                    <span class="hub-ls-badge">Executor Ready</span>
+                  </div>
+                  <button class="hub-ls-copy" id="hub-copy-ls">
+                    <i class="fa-solid fa-copy"></i> Copy
+                  </button>
+                </div>
+                <div class="hub-ls-code-wrap">
+                  <textarea id="hub-ls-output" class="code-area hub-ls-ta" readonly spellcheck="false"></textarea>
+                </div>
+              </div>
+
+              <!-- Raw link block -->
+              <div class="hub-url-block">
+                <div class="hub-url-header">
+                  <div class="hub-url-title">
+                    <i class="fa-solid fa-link"></i>
+                    Raw Script URL
+                    <span class="hub-url-badge" id="hub-url-type">blob</span>
+                  </div>
+                  <div class="hub-url-actions">
+                    <button class="hub-url-btn" id="hub-copy-url"><i class="fa-solid fa-copy"></i> Copy URL</button>
+                    <button class="hub-url-btn" id="hub-download-script"><i class="fa-solid fa-download"></i> .lua</button>
+                    <button class="hub-url-btn gist" id="hub-open-gist">
+                      <i class="fa-brands fa-github"></i> GitHub Gist
+                    </button>
+                  </div>
+                </div>
+                <input type="text" id="hub-url-display" class="hub-url-input" readonly />
+              </div>
+
+              <!-- Gist instruction -->
+              <div class="hub-gist-tip">
+                <i class="fa-solid fa-lightbulb"></i>
+                <div>
+                  <strong>Want a permanent link?</strong>
+                  Click <em>GitHub Gist</em> — it copies your script and opens Gist.
+                  Save as <em>Public</em>, click <em>Raw</em>, copy the URL and replace it in the loadstring above.
+                  The loadstring below already has a <code>blob:</code> URL that works as a preview —
+                  replace it with your Gist/Pastebin raw URL for a permanent executor link.
+                </div>
+              </div>
+
+              <!-- Script preview -->
+              <div class="hub-preview-block">
+                <div class="hub-preview-header">
+                  <span><i class="fa-solid fa-eye"></i> Script Preview</span>
+                  <span id="hub-preview-size"></span>
+                </div>
+                <textarea id="hub-preview-ta" class="code-area hub-preview-code" readonly spellcheck="false"></textarea>
+              </div>
+
+            </div>
+
+            <!-- Saved Scripts -->
+            <div class="card hub-saved-card" id="hub-saved-card" style="margin-top:1.25rem">
+              <div class="card-header">
+                <div class="card-title">
+                  <i class="fa-solid fa-bookmark"></i> Saved Scripts
+                  <span class="saved-count" id="saved-count">0</span>
+                </div>
+                <button class="ea-btn danger" id="hub-clear-all">
+                  <i class="fa-solid fa-trash"></i> Clear all
+                </button>
+              </div>
+              <div class="card-body p0">
+                <div id="hub-saved-list" class="hub-saved-list">
+                  <div class="hub-saved-empty">
+                    <i class="fa-solid fa-inbox"></i>
+                    <p>No scripts saved yet</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ PANEL: AI SCRIPT GENERATOR ═══ -->
+      <section class="panel" id="panel-aiscript" data-panel="aiscript">
+        <div class="panel-hero">
+          <div class="panel-hero-bg ai-bg"></div>
+          <div class="panel-hero-content">
+            <div class="panel-badge ai-badge">
+              <i class="fa-solid fa-wand-magic-sparkles"></i> AI Script Generator
+            </div>
+            <h1>Generate <span class="gtext-ai">Lua Scripts</span> with AI</h1>
+            <p>Describe what you want — the AI writes the full Roblox Lua script for you.</p>
+          </div>
+        </div>
+        <div class="panel-body ai-body">
+
+          <!-- API Key setup -->
+          <div class="card ai-key-card" id="ai-key-card">
+            <div class="card-header">
+              <div class="card-title"><i class="fa-solid fa-key"></i> API Configuration</div>
+              <button class="ea-btn" id="ai-key-toggle-vis"><i class="fa-solid fa-eye"></i> Show</button>
+            </div>
+            <div class="card-body">
+              <div class="ai-key-row">
+                <div class="ai-key-field">
+                  <label class="hub-field-label"><i class="fa-solid fa-robot"></i> OpenAI API Key</label>
+                  <div class="ai-key-input-wrap">
+                    <input type="password" id="ai-api-key" class="hub-input ai-key-input" placeholder="sk-..." autocomplete="off" />
+                    <button class="ai-key-save-btn" id="ai-save-key"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+                  </div>
+                  <span class="ai-key-hint">
+                    <i class="fa-solid fa-circle-info"></i>
+                    Stored only in your browser. Never sent to our servers.
+                    Get a free key at <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener">platform.openai.com</a>
+                  </span>
+                </div>
+                <div class="ai-model-field">
+                  <label class="hub-field-label"><i class="fa-solid fa-microchip"></i> Model</label>
+                  <select id="ai-model" class="hub-input">
+                    <option value="gpt-4o-mini">GPT-4o Mini (Fast · Cheap)</option>
+                    <option value="gpt-4o">GPT-4o (Best quality)</option>
+                    <option value="gpt-3.5-turbo">GPT-3.5 Turbo (Economy)</option>
+                  </select>
+                </div>
+              </div>
+              <div class="ai-key-status" id="ai-key-status"></div>
+            </div>
+          </div>
+
+          <!-- Generator -->
+          <div class="ai-generator-grid">
+            <div class="ai-left">
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-title"><i class="fa-solid fa-pen-to-square"></i> What do you want?</div>
+                  <button class="ea-btn" id="ai-prompt-clear"><i class="fa-solid fa-eraser"></i> Clear</button>
+                </div>
+                <div class="card-body">
+                  <textarea id="ai-prompt" class="ai-prompt-ta" spellcheck="false"
+                    placeholder="Describe the script in detail. Examples:&#10;&#10;• Create an ESP that shows all players through walls&#10;• Make an aimbot that locks onto the nearest player's head&#10;• Auto-farm script for Blox Fruits&#10;• Speed hack with toggle using Q key&#10;&#10;Be specific for better results!"></textarea>
+                  <div class="ai-quick-prompts">
+                    <span class="aqp-label">Quick:</span>
+                    <button class="aqp-btn" data-prompt="Create a full ESP (wallhack) for Roblox that shows all players through walls with their username, health bar (colored green to red), and distance in studs. Include a toggle with RightShift key.">ESP</button>
+                    <button class="aqp-btn" data-prompt="Create a smooth aimbot for Roblox that locks the camera onto the nearest enemy player's head. Include FOV circle, adjustable smoothness, and toggle with E key.">Aimbot</button>
+                    <button class="aqp-btn" data-prompt="Create an auto-farm script for Roblox that automatically collects all items, auto-attacks nearby NPCs, and auto-sells when inventory is full.">Auto Farm</button>
+                    <button class="aqp-btn" data-prompt="Create a speed hack and fly script. Speed 3x, fly with F key, noclip with N key. Include a small draggable GUI to toggle features.">Speed/Fly</button>
+                    <button class="aqp-btn" data-prompt="Create a full admin GUI for Roblox with commands: speed, jump, fly, noclip, god mode, kill, bring, teleport. Modern dark-themed GUI with command input.">Admin GUI</button>
+                    <button class="aqp-btn" data-prompt="Create a hitbox expander that increases all enemy player hitboxes. Include size slider from 1 to 20 in a small GUI.">Hitbox</button>
+                  </div>
+                  <button class="generate-btn ai-gen-btn" id="ai-generate">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Generate Script
+                  </button>
+                </div>
+              </div>
+
+              <div class="card" style="margin-top:1.25rem">
+                <div class="card-header">
+                  <div class="card-title"><i class="fa-solid fa-clock-rotate-left"></i> History <span class="saved-count" id="ai-history-count">0</span></div>
+                  <button class="ea-btn danger" id="ai-clear-history"><i class="fa-solid fa-trash"></i> Clear</button>
+                </div>
+                <div class="card-body p0">
+                  <div id="ai-history-list" class="hub-saved-list"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="ai-right">
+              <div class="ai-thinking" id="ai-thinking" style="display:none">
+                <div class="ai-thinking-orb"></div>
+                <div class="ai-thinking-text">
+                  <span id="ai-thinking-msg">Generating your script...</span>
+                  <div class="ai-thinking-dots"><span></span><span></span><span></span></div>
+                </div>
+              </div>
+              <div class="ai-empty" id="ai-empty">
+                <div class="ai-empty-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                <h3>Ready to generate</h3>
+                <p>Describe your script and click <strong>Generate Script</strong></p>
+                <div class="ai-empty-examples">
+                  <div class="aee-item"><i class="fa-solid fa-crosshairs"></i> Aimbot / ESP</div>
+                  <div class="aee-item"><i class="fa-solid fa-seedling"></i> Auto Farm</div>
+                  <div class="aee-item"><i class="fa-solid fa-person-running"></i> Movement hacks</div>
+                  <div class="aee-item"><i class="fa-solid fa-terminal"></i> Admin scripts</div>
+                </div>
+              </div>
+              <div class="ai-result" id="ai-result" style="display:none">
+                <div class="ai-result-header">
+                  <div class="air-title" id="air-title">Script generated!</div>
+                  <div class="air-actions">
+                    <button class="ea-btn success" id="ai-copy-result"><i class="fa-solid fa-copy"></i> Copy</button>
+                    <button class="ea-btn" id="ai-download-result"><i class="fa-solid fa-download"></i> .lua</button>
+                    <button class="ea-btn accent" id="ai-send-obf"><i class="fa-solid fa-shield-halved"></i> Obfuscate</button>
+                    <button class="ea-btn accent" id="ai-send-hub"><i class="fa-brands fa-roblox"></i> → Hub</button>
+                  </div>
+                </div>
+                <div class="editor-wrap ai-output-wrap">
+                  <div class="line-numbers" id="ln-ai-out"></div>
+                  <textarea id="ai-output" class="code-area output-area" readonly spellcheck="false"></textarea>
+                </div>
+                <div class="editor-footer">
+                  <span id="ai-output-stats">0 lines · 0 chars</span>
+                  <span class="ai-model-used" id="ai-model-used"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ PANEL: ANTI-CHEAT GENERATOR ═══ -->
+      <section class="panel" id="panel-anticheat" data-panel="anticheat">
+        <div class="panel-hero">
+          <div class="panel-hero-bg ac-bg"></div>
+          <div class="panel-hero-content">
+            <div class="panel-badge ac-badge">
+              <i class="fa-solid fa-shield-virus"></i> Anti-Cheat Generator
+            </div>
+            <h1>Build Your <span class="gtext-ac">Anti-Cheat</span> System</h1>
+            <p>Generate a complete Roblox server-side anti-cheat with the protections you choose.</p>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="ac-config-grid">
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title"><i class="fa-solid fa-radar"></i> Detection Modules</div>
+                <button class="ea-btn" id="ac-select-all">Select All</button>
+              </div>
+              <div class="card-body">
+                <div class="toggles-grid">
+                  <label class="toggle-row"><div class="toggle-switch"><input type="checkbox" id="ac-speed" checked /><span class="ts-track"><span class="ts-thumb"></span></span></div><div class="toggle-info"><span class="ti-name">Speed Hack Detection</span><span class="ti-desc">Flags abnormal WalkSpeed values</span></div><span class="ti-badge green">Server</span></label>
+                  <label class="toggle-row"><div class="toggle-switch"><input type="checkbox" id="ac-fly" checked /><span class="ts-track"><span class="ts-thumb"></span></span></div><div class="toggle-info"><span class="ti-name">Fly / Noclip Detection</span><span class="ti-desc">Detects players floating or phasing</span></div><span class="ti-badge green">Server</span></label>
+                  <label class="toggle-row"><div class="toggle-switch"><input type="checkbox" id="ac-tp" checked /><span class="ts-track"><span class="ts-thumb"></span></span></div><div class="toggle-info"><span class="ti-name">Teleport Detection</span><span class="ti-desc">Detects impossible position jumps</span></div><span class="ti-badge green">Server</span></label>
+                  <label class="toggle-row"><div class="toggle-switch"><input type="checkbox" id="ac-jump" checked /><span class="ts-track"><span class="ts-thumb"></span></span></div><div class="toggle-info"><span class="ti-name">Jump Power Detection</span><span class="ti-desc">Flags modified JumpPower</span></div><span class="ti-badge green">Server</span></label>
+                  <label class="toggle-row"><div class="toggle-switch"><input type="checkbox" id="ac-gravity" /><span class="ts-track"><span class="ts-thumb"></span></span></div><div class="toggle-info"><span class="ti-name">Gravity Manipulation</span><span class="ti-desc">Detects workspace gravity changes</span></div><span class="ti-badge blue">Extra</span></label>
+                  <label class="toggle-row"><div class="toggle-switch"><input type="checkbox" id="ac-aimbot" /><span class="ts-track"><span class="ts-thumb"></span></span></div><div class="toggle-info"><span class="ti-name">Aimbot Detection</span><span class="ti-desc">Detects inhuman aim patterns</span></div><span class="ti-badge orange">Advanced</span></label>
+                  <label class="toggle-row"><div class="toggle-switch"><input type="checkbox" id="ac-remotes" /><span class="ts-track"><span class="ts-thumb"></span></span></div><div class="toggle-info"><span class="ti-name">Remote Spam Detection</span><span class="ti-desc">Rate-limits RemoteEvent calls</span></div><span class="ti-badge orange">Advanced</span></label>
+                  <label class="toggle-row"><div class="toggle-switch"><input type="checkbox" id="ac-god" /><span class="ts-track"><span class="ts-thumb"></span></span></div><div class="toggle-info"><span class="ti-name">God Mode Detection</span><span class="ti-desc">Detects infinite health exploits</span></div><span class="ti-badge red">Heavy</span></label>
+                </div>
+              </div>
+            </div>
+
+            <div class="ac-right-col">
+              <div class="card">
+                <div class="card-header"><div class="card-title"><i class="fa-solid fa-gavel"></i> Punishment Actions</div></div>
+                <div class="card-body">
+                  <div class="toggles-grid" style="grid-template-columns:1fr">
+                    <label class="toggle-row"><div class="toggle-switch"><input type="checkbox" id="ac-action-kick" checked /><span class="ts-track"><span class="ts-thumb"></span></span></div><div class="toggle-info"><span class="ti-name">Kick Player</span><span class="ti-desc">Kick with reason message</span></div></label>
+                    <label class="toggle-row"><div class="toggle-switch"><input type="checkbox" id="ac-action-log" checked /><span class="ts-track"><span class="ts-thumb"></span></span></div><div class="toggle-info"><span class="ti-name">Log to Output</span><span class="ti-desc">Print detection details server-side</span></div></label>
+                    <label class="toggle-row"><div class="toggle-switch"><input type="checkbox" id="ac-action-warn" /><span class="ts-track"><span class="ts-thumb"></span></span></div><div class="toggle-info"><span class="ti-name">Warn First (3 strikes)</span><span class="ti-desc">Warn before kicking</span></div></label>
+                    <label class="toggle-row"><div class="toggle-switch"><input type="checkbox" id="ac-action-reset" /><span class="ts-track"><span class="ts-thumb"></span></span></div><div class="toggle-info"><span class="ti-name">Reset Character</span><span class="ti-desc">Reset instead of kick on first detect</span></div></label>
+                  </div>
+                </div>
+              </div>
+              <div class="card" style="margin-top:1rem">
+                <div class="card-header"><div class="card-title"><i class="fa-solid fa-sliders"></i> Thresholds</div></div>
+                <div class="card-body">
+                  <div class="ac-threshold-grid">
+                    <div class="ac-threshold-item"><label class="hub-field-label">Max WalkSpeed</label><input type="number" id="ac-max-speed" class="hub-input" value="32" min="16" max="200" /></div>
+                    <div class="ac-threshold-item"><label class="hub-field-label">Max JumpPower</label><input type="number" id="ac-max-jump" class="hub-input" value="75" min="50" max="500" /></div>
+                    <div class="ac-threshold-item"><label class="hub-field-label">Teleport Threshold (studs)</label><input type="number" id="ac-tp-threshold" class="hub-input" value="60" min="10" max="500" /></div>
+                    <div class="ac-threshold-item"><label class="hub-field-label">Remote Rate Limit (calls/s)</label><input type="number" id="ac-remote-rate" class="hub-input" value="20" min="5" max="100" /></div>
+                  </div>
+                  <div class="hub-field" style="margin-top:.85rem">
+                    <label class="hub-field-label"><i class="fa-solid fa-tag"></i> Game Name (for kick msg)</label>
+                    <input type="text" id="ac-game-name" class="hub-input" placeholder="My Awesome Game" maxlength="40" />
+                  </div>
+                  <button class="generate-btn" style="margin-top:1rem" id="ac-generate">
+                    <i class="fa-solid fa-shield-virus"></i> Generate Anti-Cheat
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" id="ac-output-card" style="display:none;margin-top:1.5rem">
+            <div class="card-header">
+              <div class="card-title"><i class="fa-solid fa-file-shield"></i> Generated Anti-Cheat <span class="ti-badge green">ServerScriptService</span></div>
+              <div class="editor-actions">
+                <button class="ea-btn success" id="ac-copy"><i class="fa-solid fa-copy"></i> Copy</button>
+                <button class="ea-btn" id="ac-download"><i class="fa-solid fa-download"></i> .lua</button>
+                <button class="ea-btn accent" id="ac-obfuscate"><i class="fa-solid fa-shield-halved"></i> Obfuscate</button>
+              </div>
+            </div>
+            <div class="editor-wrap" style="min-height:400px;max-height:600px">
+              <div class="line-numbers" id="ln-ac-out"></div>
+              <textarea id="ac-output" class="code-area output-area" readonly spellcheck="false"></textarea>
+            </div>
+            <div class="editor-footer">
+              <span id="ac-output-stats">0 lines · 0 chars</span>
+              <span class="ef-protected"><i class="fa-solid fa-shield-check"></i> Server-Side</span>
+            </div>
+          </div>
+
+          <div class="card" id="ac-instructions" style="display:none;margin-top:1rem">
+            <div class="card-header"><div class="card-title"><i class="fa-solid fa-circle-question"></i> How to install</div></div>
+            <div class="card-body">
+              <div class="ac-steps">
+                <div class="ac-step"><span class="ac-step-num">1</span><span>Open your game in Roblox Studio</span></div>
+                <div class="ac-step"><span class="ac-step-num">2</span><span>Go to <strong>ServerScriptService</strong> in the Explorer</span></div>
+                <div class="ac-step"><span class="ac-step-num">3</span><span>Right-click → Insert Object → <strong>Script</strong></span></div>
+                <div class="ac-step"><span class="ac-step-num">4</span><span>Paste the generated code, rename to <strong>AntiCheat</strong></span></div>
+                <div class="ac-step"><span class="ac-step-num">5</span><span>Publish your game — anti-cheat runs server-side automatically</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ PANEL: BYPASS GENERATOR ═══ -->
+      <section class="panel" id="panel-bypass" data-panel="bypass">
+        <div class="panel-hero">
+          <div class="panel-hero-bg bypass-bg"></div>
+          <div class="panel-hero-content">
+            <div class="panel-badge bypass-badge">
+              <i class="fa-solid fa-ghost"></i> Bypass Generator
+            </div>
+            <h1>Ultimate <span class="gtext-bypass">Bypass Suite</span></h1>
+            <p>Generate executor-ready bypass scripts with anti-detection, hooks, and spoofing for Roblox anti-cheats.</p>
+          </div>
+        </div>
+        <div class="panel-body">
+
+          <div class="bypass-grid">
+            <!-- Left: options -->
+            <div class="bypass-left">
+
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-title"><i class="fa-solid fa-wand-sparkles"></i> Bypass Modules</div>
+                  <button class="ea-btn" id="bypass-select-all">All</button>
+                </div>
+                <div class="card-body">
+                  <div class="toggles-grid">
+                    <label class="toggle-row"><div class="toggle-switch"><input type="checkbox" id="bp-metamethod" checked /><span class="ts-track"><span class="ts-thumb"></span></span></div><div class="toggle-info"><span class="ti-name">Metamethod Hook Engine</span><span class="ti-desc">Hook __namecall, __index, __newindex</span></div><span class="ti-badge red">Core</span></label>
+                    <label class="toggle-row"><div class="toggle-switch"><input type="checkbox" id="bp-spoof-hum" checked /><span class="ts-track"><span class="ts-thumb"></span></span></div><div class="toggle-info"><span class="ti-name">Humanoid Spoofer</span><span class="ti-desc">Spoof speed/jump to appear legit</span></div><span class="ti-badge red">Core</span></label>
+                    <label class="toggle-row"><div class="toggle-switch"><input type="checkbox" id="bp-hook-remotes" checked /><span class="ts-track"><span class="ts-thumb"></span></span></div><div class="toggle-info"><span class="ti-name">Remote Monitor/Blocker</span><span class="ti-desc">Intercept and block anti-cheat remotes</span></div><span class="ti-badge orange">Hook</span></label>
+                    <label class="toggle-row"><div class="toggle-switch"><input type="checkbox" id="bp-anti-detect" checked /><span class="ts-track"><span class="ts-thumb"></span></span></div><div class="toggle-info"><span class="ti-name">Anti-Detection Module</span><span class="ti-desc">Hide from script scans, spoof identity</span></div><span class="ti-badge orange">Hook</span></label>
+                    <label class="toggle-row"><div class="toggle-switch"><input type="checkbox" id="bp-speed" /><span class="ts-track"><span class="ts-thumb"></span></span></div><div class="toggle-info"><span class="ti-name">Speed Bypass</span><span class="ti-desc">Ramp speed to avoid spike detection</span></div><span class="ti-badge blue">Movement</span></label>
+                    <label class="toggle-row"><div class="toggle-switch"><input type="checkbox" id="bp-fly" /><span class="ts-track"><span class="ts-thumb"></span></span></div><div class="toggle-info"><span class="ti-name">Fly Bypass</span><span class="ti-desc">BodyVelocity fly with F key toggle</span></div><span class="ti-badge blue">Movement</span></label>
+                    <label class="toggle-row"><div class="toggle-switch"><input type="checkbox" id="bp-tp" /><span class="ts-track"><span class="ts-thumb"></span></span></div><div class="toggle-info"><span class="ti-name">Safe Teleport</span><span class="ti-desc">Step teleport to avoid detection</span></div><span class="ti-badge blue">Movement</span></label>
+                    <label class="toggle-row"><div class="toggle-switch"><input type="checkbox" id="bp-god" /><span class="ts-track"><span class="ts-thumb"></span></span></div><div class="toggle-info"><span class="ti-name">God Mode Bypass</span><span class="ti-desc">Health regen without triggering checks</span></div><span class="ti-badge purple">Combat</span></label>
+                    <label class="toggle-row"><div class="toggle-switch"><input type="checkbox" id="bp-silent-aim" /><span class="ts-track"><span class="ts-thumb"></span></span></div><div class="toggle-info"><span class="ti-name">Silent Aim</span><span class="ti-desc">Redirect bullets via mouse hook</span></div><span class="ti-badge purple">Combat</span></label>
+                    <label class="toggle-row"><div class="toggle-switch"><input type="checkbox" id="bp-inf-ammo" /><span class="ts-track"><span class="ts-thumb"></span></span></div><div class="toggle-info"><span class="ti-name">Infinite Ammo</span><span class="ti-desc">Hook ammo remotes to prevent depletion</span></div><span class="ti-badge purple">Combat</span></label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card" style="margin-top:1.25rem">
+                <div class="card-header"><div class="card-title"><i class="fa-solid fa-code"></i> Inject Into Script (optional)</div></div>
+                <div class="card-body">
+                  <div class="editor-wrap" style="min-height:180px">
+                    <div class="line-numbers" id="ln-bp-inject"></div>
+                    <textarea id="bp-target-script" class="code-area" spellcheck="false"
+                      placeholder="-- Paste an existing script here to inject the bypass into it (optional)"></textarea>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card" style="margin-top:1.25rem">
+                <div class="card-header"><div class="card-title"><i class="fa-solid fa-gear"></i> Options</div></div>
+                <div class="card-body">
+                  <div class="hub-field" style="margin-bottom:.85rem">
+                    <label class="hub-field-label"><i class="fa-solid fa-tag"></i> Game / Target Name</label>
+                    <input type="text" id="bp-game-name" class="hub-input" placeholder="Blox Fruits, Arsenal..." maxlength="40" />
+                  </div>
+                  <button class="generate-btn bypass-gen-btn" id="bp-generate">
+                    <i class="fa-solid fa-ghost"></i> Generate Bypass
+                  </button>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Right: output -->
+            <div class="bypass-right">
+              <div class="bypass-empty" id="bp-empty">
+                <div class="bypass-empty-icon"><i class="fa-solid fa-ghost"></i></div>
+                <h3>Ready to bypass</h3>
+                <p>Select modules and click <strong>Generate Bypass</strong></p>
+                <div class="bypass-features">
+                  <div class="bf-item"><i class="fa-solid fa-hook"></i> Metamethod Hooks</div>
+                  <div class="bf-item"><i class="fa-solid fa-mask"></i> Identity Spoofing</div>
+                  <div class="bf-item"><i class="fa-solid fa-network-wired"></i> Remote Interception</div>
+                  <div class="bf-item"><i class="fa-solid fa-person-running"></i> Movement Bypass</div>
+                </div>
+              </div>
+
+              <div class="bypass-result" id="bp-result" style="display:none">
+                <div class="bypass-result-header">
+                  <div class="bpr-title"><i class="fa-solid fa-ghost"></i> Bypass Generated!</div>
+                  <div class="bpr-actions">
+                    <button class="ea-btn success" id="bp-copy"><i class="fa-solid fa-copy"></i> Copy</button>
+                    <button class="ea-btn" id="bp-download"><i class="fa-solid fa-download"></i> .lua</button>
+                    <button class="ea-btn accent" id="bp-obfuscate"><i class="fa-solid fa-shield-halved"></i> Obfuscate</button>
+                    <button class="ea-btn accent" id="bp-send-hub"><i class="fa-brands fa-roblox"></i> → Hub</button>
+                  </div>
+                </div>
+                <div class="editor-wrap" style="min-height:400px;max-height:600px">
+                  <div class="line-numbers" id="ln-bp-out"></div>
+                  <textarea id="bp-output" class="code-area output-area" readonly spellcheck="false"></textarea>
+                </div>
+                <div class="editor-footer">
+                  <span id="bp-stats">0 lines · 0 chars</span>
+                  <span class="ef-protected" style="color:#c084fc"><i class="fa-solid fa-ghost"></i> Executor Ready</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </div><!-- /panels-wrap -->
+
+    <!-- ═══ BYPASS INTEGRATION MODAL ═══ -->
+    <div class="modal-overlay" id="bypass-modal">
+      <div class="modal-box-sm">
+        <div class="modal-header">
+          <div class="modal-title">
+            <div class="modal-title-icon ghost-icon"><i class="fa-solid fa-ghost"></i></div>
+            <div>
+              <span class="modal-title-text">Add Bypass to Your Script?</span>
+              <span class="modal-title-sub">Integrate bypass/anti-detection into your existing script</span>
+            </div>
+          </div>
+          <button class="modal-close" id="bypass-modal-close"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="modal-body-sm">
+          <div class="bypass-modal-question">
+            <p>Your Anti-Cheat was generated. Do you have a <strong>player script</strong> you want to add bypass protection to?</p>
+          </div>
+          <textarea id="bypass-modal-script" class="code-area bypass-modal-ta" spellcheck="false"
+            placeholder="-- Paste your player script here (ESP, aimbot, farm, etc.)&#10;-- The bypass will be integrated automatically"></textarea>
+          <div class="bypass-modal-desc">
+            <label class="hub-field-label"><i class="fa-solid fa-list-check"></i> What should the bypass do?</label>
+            <input type="text" id="bypass-modal-desc-input" class="hub-input"
+              placeholder="e.g. bypass speed, fly detection, avoid kick..." />
+          </div>
+          <div class="bypass-modal-actions">
+            <button class="btn-modal-skip" id="bypass-modal-skip">Skip</button>
+            <button class="btn-modal-gen" id="bypass-modal-gen">
+              <i class="fa-solid fa-ghost"></i> Generate with Bypass
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ PANEL: BYPASS GENERATOR ═══ -->
+    <div id="panel-bypass-inject" style="display:none"><!-- injected by JS --></div>
+
+    <!-- TOAST -->
+    <div class="toast-container" id="toast-container"></div>
+
+  </div><!-- /main-app -->
+
+  <script src="js/obfuscator.js"></script>
+  <script src="js/ai.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
