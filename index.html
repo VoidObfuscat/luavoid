@@ -971,11 +971,27 @@
                     <div class="ac-threshold-item"><label class="hub-field-label">Remote Rate Limit (calls/s)</label><input type="number" id="ac-remote-rate" class="hub-input" value="20" min="5" max="100" /></div>
                   </div>
                   <div class="hub-field" style="margin-top:.85rem">
-                    <label class="hub-field-label"><i class="fa-solid fa-tag"></i> Game Name (for kick msg)</label>
-                    <input type="text" id="ac-game-name" class="hub-input" placeholder="My Awesome Game" maxlength="40" />
+                    <label class="hub-field-label"><i class="fa-solid fa-tag"></i> Game Name</label>
+                    <input type="text" id="ac-game-name" class="hub-input" placeholder="Ex: Blox Fruits, Arsenal..." maxlength="40" />
                   </div>
-                  <button class="generate-btn" style="margin-top:1rem" id="ac-generate">
-                    <i class="fa-solid fa-shield-virus"></i> Generate Anti-Cheat
+
+                  <!-- AI Analyze Button -->
+                  <button class="btn-ai-analyze" id="ac-ai-analyze" style="margin-top:.85rem">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    <span>AI Analyze Game</span>
+                    <span class="baa-sub">Auto-selects best detections</span>
+                  </button>
+
+                  <!-- AI Analysis Result -->
+                  <div class="ac-ai-result" id="ac-ai-result" style="display:none">
+                    <div class="ac-ai-result-header">
+                      <i class="fa-solid fa-circle-check"></i>
+                      <span id="ac-ai-reason">Analysis complete</span>
+                    </div>
+                  </div>
+
+                  <button class="generate-btn" style="margin-top:.85rem" id="ac-generate">
+                    <i class="fa-solid fa-shield-virus"></i> Generate Anti-Cheat Script
                   </button>
                 </div>
               </div>

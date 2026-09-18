@@ -2162,3 +2162,50 @@ select.hub-input option { background: var(--bg-4); color: var(--tx-1); }
   .gpb-thumb { margin: 0; }
   .game-dropdown { width: 94vw; right: -8px; }
 }
+
+/* ── Emoji thumb in game picker ── */
+.gri-thumb-emoji {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.5rem; background: var(--bg-3);
+}
+
+/* ── AI Analyze button ── */
+.btn-ai-analyze {
+  width: 100%;
+  display: flex; align-items: center; gap: .65rem;
+  background: linear-gradient(135deg, rgba(168,85,247,.15), rgba(124,90,245,.1));
+  border: 1px solid rgba(168,85,247,.35);
+  border-radius: var(--radius);
+  padding: .65rem 1rem;
+  cursor: pointer;
+  transition: var(--trans);
+  font-family: var(--font);
+}
+.btn-ai-analyze:hover {
+  background: linear-gradient(135deg, rgba(168,85,247,.25), rgba(124,90,245,.18));
+  border-color: rgba(168,85,247,.6);
+  transform: translateY(-1px);
+}
+.btn-ai-analyze i { color: #c084fc; font-size: 1rem; flex-shrink: 0; }
+.btn-ai-analyze > span:first-of-type { font-size: .85rem; font-weight: 700; color: #c084fc; }
+.btn-ai-analyze .baa-sub { font-size: .7rem; color: var(--tx-3); margin-left: auto; }
+.btn-ai-analyze.loading { opacity: .7; pointer-events: none; }
+.btn-ai-analyze.loading i { animation: spin .8s linear infinite; }
+
+/* ── AI Analysis result banner ── */
+.ac-ai-result {
+  background: rgba(74,222,128,.06);
+  border: 1px solid rgba(74,222,128,.2);
+  border-radius: var(--radius);
+  padding: .65rem .9rem;
+}
+.ac-ai-result-header {
+  display: flex; align-items: center; gap: .5rem;
+  font-size: .8rem; font-weight: 600; color: var(--green);
+  line-height: 1.5;
+}
+.ac-ai-result-header i { flex-shrink: 0; }
+
+/* ── Anti-cheat instructions update ── */
+.ac-instructions .card-body { padding: 1rem 1.25rem; }

@@ -1441,3 +1441,90 @@ $('bp-send-hub')?.addEventListener('click', () => {
   switchTab('scripthub');
   toast('Sent to Hub!', 'success');
 });
+
+
+/* ══════════════════════════════════════════════
+   ANTI-CHEAT AI ANALYZER
+   Reads the selected game context, asks Groq to
+   decide which detections are most relevant, then
+   auto-checks/unchecks the toggles.
+══════════════════════════════════════════════ */
+document.getElementById('ac-ai-analyze')?.addEventListener('click', async function() {
+  const gameCtx = window.getGameContext?.();
+  const gameName = document.getElementById('ac-game-name')?.value?.trim();
+
+  if (!gameCtx && !gameName) {
+    toast('Select a game first using the Game Picker!', 'warn', 4000);
+    return;
+  }
+
+  const apiKey = localStorage.getItem('lv3_groq_key') || '';
+  if (!apiKey) {
+    toast('Save your Groq API key in the AI Script tab first!', 'warn', 4000);
+    return;
+  }
+
+  const btn = this;
+  btn.classList.add('loading');
+  btn.querySelector('span:first-of-type').textContent = 'Analyzing...';
+
+  const prompt = gameCtx?.aiAntiCheatPrompt ||
+    `You are LuaVoid AI. Analyze the Roblox game "${gameName}" and decide which executor-side cheat detections are most relevant.\nOutput ONLY a JSON object:\n{"speed":true,"fly":true,"tp":true,"god":false,"aimbot":true,"noclip":false,"hitbox":false,"remoteSpam":false,"reason":"<one sentence>"}`;
+
+  try {
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        messages: [
+          { role: 'system', content: 'You are a Roblox anti-cheat expert. Output only valid JSON, no markdown.' },
+          { role: 'user',   content: prompt },
+        ],
+        max_tokens: 300,
+        temperature: 0.1,
+      }),
+    });
+
+    if (!res.ok) throw new Error('API error ' + res.status);
+    const data = await res.json();
+    let raw = data.choices?.[0]?.message?.content?.trim() || '';
+
+    // Strip markdown fences if present
+    raw = raw.replace(/^```(?:json)?\n?/i,'').replace(/\n?```$/i,'').trim();
+    const analysis = JSON.parse(raw);
+
+    // Apply to checkboxes
+    const MAP = {
+      speed:      'ac-speed',
+      fly:        'ac-fly',
+      tp:         'ac-tp',
+      god:        'ac-god',
+      aimbot:     'ac-aimbot',
+      noclip:     'ac-noclip',
+      hitbox:     'ac-hitbox',
+      remoteSpam: 'ac-remotes',
+      jump:       'ac-jump',
+    };
+
+    Object.entries(MAP).forEach(([key, elId]) => {
+      const el = document.getElementById(elId);
+      if (el && analysis[key] !== undefined) el.checked = !!analysis[key];
+    });
+
+    // Show reason
+    const resultEl = document.getElementById('ac-ai-result');
+    const reasonEl = document.getElementById('ac-ai-reason');
+    if (resultEl && reasonEl) {
+      reasonEl.textContent = analysis.reason || 'Detections auto-selected based on game genre.';
+      resultEl.style.display = 'block';
+    }
+
+    toast('AI analyzed the game and updated detections!', 'success');
+  } catch(e) {
+    toast('AI analyze error: ' + (e.message || 'unknown'), 'error', 4000);
+  } finally {
+    btn.classList.remove('loading');
+    btn.querySelector('span:first-of-type').textContent = 'AI Analyze Game';
+  }
+});

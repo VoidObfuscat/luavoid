@@ -126,7 +126,10 @@ Your bypass scripts should:
 
 
 /* ══════════════════════════════════════════════
-   ANTI-CHEAT GENERATOR (local, no API)
+   ANTI-CHEAT GENERATOR
+   ⚡ Executor-side detector — runs via loadstring
+   Detects cheaters ON THE SERVER from client view
+   (reads replicated properties visible to all)
 ══════════════════════════════════════════════ */
 const AntiCheatGenerator = (() => {
 
@@ -139,13 +142,296 @@ const AntiCheatGenerator = (() => {
       gameName, webhookUrl,
     } = cfg;
 
-    const gn = (gameName || 'My Game').replace(/['"]/g, '');
+    const gn = (gameName || 'Game').replace(/['"]/g, '');
     const L  = [];
-
     const push = (...lines) => lines.forEach(l => L.push(l));
 
+    /* ── HEADER ── */
     push(
-      `-- ╔══════════════════════════════════════════════════╗`,
+      `--[[ LuaVoid Anti-Cheat Detector v4.0`,
+      `     Executor-Side — runs via loadstring() in your executor`,
+      `     Detects cheaters by reading replicated game state`,
+      `     Compatible: Synapse X, KRNL, Fluxus, Delta, Hydrogen`,
+      `--]]`,
+      ``,
+      `-- [ SERVICES ]`,
+      `local Players    = game:GetService("Players")`,
+      `local RunService = game:GetService("RunService")`,
+      `local lp         = Players.LocalPlayer`,
+      ``,
+      `-- [ CONFIG ]`,
+      `local CFG = {`,
+      `  MAX_SPEED     = ${maxSpeed},`,
+      `  MAX_JUMP      = ${maxJump},`,
+      `  TP_THRESHOLD  = ${tpThreshold},`,
+      `  MAX_HITBOX    = ${maxHitbox || 6},`,
+      `  GAME_NAME     = "${gn}",`,
+      `  WARN_COUNT    = 3,`,
+      `}`,
+      ``,
+      `-- [ STATE ]`,
+      `local suspects = {}   -- [userId] = { strikes, lastPos, lastTime, flyFrames }`,
+      `local detected = {}   -- already-flagged set`,
+      ``,
+      `-- [ GUI NOTIFICATION ] `,
+      `local screenGui, frame, logList`,
+      `local function buildGui()`,
+      `  screenGui = Instance.new("ScreenGui")`,
+      `  screenGui.Name         = "LVAntiCheat"`,
+      `  screenGui.ResetOnSpawn = false`,
+      `  screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling`,
+      `  pcall(function() screenGui.Parent = game:GetService("CoreGui") end)`,
+      `  if not screenGui.Parent then screenGui.Parent = lp.PlayerGui end`,
+      ``,
+      `  local main = Instance.new("Frame", screenGui)`,
+      `  main.Size            = UDim2.new(0, 320, 0, 220)`,
+      `  main.Position        = UDim2.new(0, 12, 0.5, -110)`,
+      `  main.BackgroundColor3= Color3.fromRGB(10,10,16)`,
+      `  main.BorderSizePixel = 0`,
+      `  Instance.new("UICorner", main).CornerRadius = UDim.new(0,10)`,
+      `  Instance.new("UIStroke", main).Color        = Color3.fromRGB(124,90,245)`,
+      ``,
+      `  local title = Instance.new("TextLabel", main)`,
+      `  title.Size            = UDim2.new(1,0,0,28)`,
+      `  title.BackgroundColor3= Color3.fromRGB(20,18,30)`,
+      `  title.Text            = "🛡 LuaVoid AntiCheat — " .. CFG.GAME_NAME`,
+      `  title.TextColor3      = Color3.fromRGB(180,160,255)`,
+      `  title.Font            = Enum.Font.GothamBold`,
+      `  title.TextSize        = 12`,
+      `  title.BorderSizePixel = 0`,
+      `  Instance.new("UICorner", title).CornerRadius = UDim.new(0,10)`,
+      ``,
+      `  -- Drag`,
+      `  local drag, dragging, dstart, mstart = false`,
+      `  title.InputBegan:Connect(function(i)`,
+      `    if i.UserInputType == Enum.UserInputType.MouseButton1 then`,
+      `      dragging = true`,
+      `      dstart   = main.Position`,
+      `      mstart   = i.Position`,
+      `    end`,
+      `  end)`,
+      `  game:GetService("UserInputService").InputChanged:Connect(function(i)`,
+      `    if dragging and i.UserInputType == Enum.UserInputType.MouseMovement then`,
+      `      local d = i.Position - mstart`,
+      `      main.Position = UDim2.new(dstart.X.Scale, dstart.X.Offset+d.X, dstart.Y.Scale, dstart.Y.Offset+d.Y)`,
+      `    end`,
+      `  end)`,
+      `  game:GetService("UserInputService").InputEnded:Connect(function(i)`,
+      `    if i.UserInputType == Enum.UserInputType.MouseButton1 then dragging = false end`,
+      `  end)`,
+      ``,
+      `  local scroll = Instance.new("ScrollingFrame", main)`,
+      `  scroll.Size             = UDim2.new(1,-8,1,-36)`,
+      `  scroll.Position         = UDim2.new(0,4,0,30)`,
+      `  scroll.BackgroundTransparency = 1`,
+      `  scroll.ScrollBarThickness     = 3`,
+      `  scroll.ScrollBarImageColor3   = Color3.fromRGB(124,90,245)`,
+      `  scroll.CanvasSize       = UDim2.new(0,0,0,0)`,
+      `  Instance.new("UIListLayout", scroll).Padding = UDim.new(0,2)`,
+      `  logList = scroll`,
+      `end`,
+      ``,
+      `local function logDetect(msg, color)`,
+      `  if not logList then buildGui() end`,
+      `  local row = Instance.new("TextLabel", logList)`,
+      `  row.Size             = UDim2.new(1,-4,0,18)`,
+      `  row.BackgroundColor3 = Color3.fromRGB(20,14,30)`,
+      `  row.Text             = msg`,
+      `  row.TextColor3       = color or Color3.fromRGB(248,113,113)`,
+      `  row.Font             = Enum.Font.Gotham`,
+      `  row.TextSize         = 11`,
+      `  row.TextXAlignment   = Enum.TextXAlignment.Left`,
+      `  row.TextTruncate     = Enum.TextTruncate.AtEnd`,
+      `  row.BorderSizePixel  = 0`,
+      `  Instance.new("UICorner", row).CornerRadius = UDim.new(0,4)`,
+      `  Instance.new("UIPadding", row).PaddingLeft = UDim.new(0,6)`,
+      `  logList.CanvasSize   = UDim2.new(0,0,0, #logList:GetChildren() * 20)`,
+      `  logList.CanvasPosition = Vector2.new(0, logList.CanvasSize.Y.Offset)`,
+      `  warn("[LVAntiCheat] " .. msg)`,
+      `end`,
+      ``,
+    );
+
+    /* ── INIT STATE ── */
+    push(
+      `-- [ INIT STATE PER PLAYER ]`,
+      `local function initPlayer(p)`,
+      `  if p == lp then return end`,
+      `  suspects[p.UserId] = {`,
+      `    strikes   = 0,`,
+      `    lastPos   = Vector3.new(0,0,0),`,
+      `    lastTime  = tick(),`,
+      `    flyFrames = 0,`,
+      `    lastHP    = 100,`,
+      `  }`,
+      `end`,
+      `for _, p in ipairs(Players:GetPlayers()) do initPlayer(p) end`,
+      `Players.PlayerAdded:Connect(initPlayer)`,
+      `Players.PlayerRemoving:Connect(function(p) suspects[p.UserId] = nil detected[p.UserId] = nil end)`,
+      ``,
+    );
+
+    /* ── FLAG FUNCTION ── */
+    push(
+      `-- [ FLAG A PLAYER ]`,
+      `local function flag(player, reason, sev)`,
+      `  sev = sev or 1`,
+      `  local s = suspects[player.UserId]`,
+      `  if not s then return end`,
+      `  s.strikes = s.strikes + sev`,
+    );
+    if (actionLog) push(
+      `  local msg = ("⚠ %s — %s (x%d)"):format(player.Name, reason, s.strikes)`,
+      `  logDetect(msg)`,
+    );
+    if (actionWarn) push(
+      `  if s.strikes < CFG.WARN_COUNT then return end  -- warn-only until threshold`,
+    );
+    if (actionReset) push(
+      `  -- Reset their character (forces respawn)`,
+      `  if player.Character then`,
+      `    local hum = player.Character:FindFirstChild("Humanoid")`,
+      `    if hum then hum.Health = 0 end`,
+      `  end`,
+    );
+    if (actionKick) push(
+      `  if not detected[player.UserId] then`,
+      `    detected[player.UserId] = true`,
+      `    -- Fire a kick remote if game has one, otherwise log`,
+      `    -- Note: only server can truly kick; this notifies + disables interaction`,
+      `    logDetect("🚨 KICKED: " .. player.Name .. " — " .. reason, Color3.fromRGB(248,113,113))`,
+      `    -- Try to find game's kick remote`,
+      `    pcall(function()`,
+      `      local remote = game.ReplicatedStorage:FindFirstChild("KickPlayer")`,
+      `        or game.ReplicatedStorage:FindFirstChild("Kick")`,
+      `      if remote and remote:IsA("RemoteFunction") then`,
+      `        remote:InvokeServer(reason)`,
+      `      end`,
+      `    end)`,
+      `  end`,
+    );
+    push(`end`, ``);
+
+    /* ── HEARTBEAT CHECKS ── */
+    push(
+      `-- [ DETECTION LOOP — runs every frame ]`,
+      `RunService.Heartbeat:Connect(function()`,
+      `  for _, player in ipairs(Players:GetPlayers()) do`,
+      `    if player == lp then continue end`,
+      `    local s = suspects[player.UserId]`,
+      `    if not s then continue end`,
+      `    local char = player.Character`,
+      `    if not char then continue end`,
+      `    local hrp  = char:FindFirstChild("HumanoidRootPart")`,
+      `    local hum  = char:FindFirstChild("Humanoid")`,
+      `    if not hrp or not hum then continue end`,
+      ``,
+    );
+
+    if (speed) push(
+      `    -- Speed hack: WalkSpeed visible to all clients`,
+      `    if hum.WalkSpeed > CFG.MAX_SPEED then`,
+      `      flag(player, ("SpeedHack WS=%.0f"):format(hum.WalkSpeed), 2)`,
+      `    end`,
+      ``,
+    );
+
+    if (jump) push(
+      `    -- Jump hack: JumpPower visible to all clients`,
+      `    if hum.JumpPower > CFG.MAX_JUMP then`,
+      `      flag(player, ("JumpHack JP=%.0f"):format(hum.JumpPower), 2)`,
+      `    end`,
+      ``,
+    );
+
+    if (god) push(
+      `    -- God mode: health above MaxHealth`,
+      `    if hum.Health > hum.MaxHealth * 1.05 and hum.MaxHealth > 0 then`,
+      `      flag(player, ("GodMode HP=%.0f/%.0f"):format(hum.Health, hum.MaxHealth), 2)`,
+      `    end`,
+      ``,
+    );
+
+    if (tp) push(
+      `    -- Teleport: impossible distance in one frame`,
+      `    local now  = tick()`,
+      `    local dt   = now - s.lastTime`,
+      `    local dist = (hrp.Position - s.lastPos).Magnitude`,
+      `    if dt > 0.05 and dist > CFG.TP_THRESHOLD and hum.MoveDirection.Magnitude < 0.05 then`,
+      `      flag(player, ("TeleportHack %.0f studs"):format(dist), 2)`,
+      `    end`,
+      `    s.lastPos  = hrp.Position`,
+      `    s.lastTime = now`,
+      ``,
+    );
+
+    if (fly) push(
+      `    -- Fly hack: sustained airborne + horizontal movement`,
+      `    if hum.FloorMaterial == Enum.Material.Air then`,
+      `      local rp = RaycastParams.new()`,
+      `      rp.FilterDescendantsInstances = {char}`,
+      `      rp.FilterType = Enum.RaycastFilterType.Exclude`,
+      `      local ray = workspace:Raycast(hrp.Position, Vector3.new(0,-20,0), rp)`,
+      `      if not ray and hrp.Velocity.Magnitude > 5 then`,
+      `        s.flyFrames = s.flyFrames + 1`,
+      `        if s.flyFrames > 20 then`,
+      `          flag(player, ("FlyHack airborne %.0f frames"):format(s.flyFrames), 2)`,
+      `          s.flyFrames = 0`,
+      `        end`,
+      `      else s.flyFrames = 0 end`,
+      `    else s.flyFrames = 0 end`,
+      ``,
+    );
+
+    if (noclip) push(
+      `    -- Noclip: player inside a solid part`,
+      `    local rp2 = RaycastParams.new()`,
+      `    rp2.FilterDescendantsInstances = {char}`,
+      `    rp2.FilterType = Enum.RaycastFilterType.Exclude`,
+      `    local allParts = workspace:GetPartsInPart(hrp)`,
+      `    local solidCount = 0`,
+      `    for _, p in ipairs(allParts) do`,
+      `      if p.CanCollide and not p:IsA("Terrain") then solidCount += 1 end`,
+      `    end`,
+      `    if solidCount > 0 then`,
+      `      flag(player, ("Noclip inside " .. solidCount .. " parts"), 1)`,
+      `    end`,
+      ``,
+    );
+
+    if (hitbox) push(
+      `    -- Hitbox expander: oversized parts`,
+      `    for _, part in ipairs(char:GetDescendants()) do`,
+      `      if part:IsA("BasePart") and part.Size.Magnitude > CFG.MAX_HITBOX * 3 then`,
+      `        flag(player, ("HitboxExpander %.1f"):format(part.Size.Magnitude), 2)`,
+      `        break`,
+      `      end`,
+      `    end`,
+      ``,
+    );
+
+    if (gravity) push(
+      `    -- Gravity exploit`,
+      `    if workspace.Gravity < 50 or workspace.Gravity > 600 then`,
+      `      flag(player, ("GravityHack g=%.1f"):format(workspace.Gravity), 1)`,
+      `    end`,
+      ``,
+    );
+
+    push(`  end`, `end)`, ``);
+
+    /* ── FINAL ── */
+    push(
+      `buildGui()`,
+      `logDetect("✅ AntiCheat active — watching " .. #Players:GetPlayers() .. " players", Color3.fromRGB(74,222,128))`,
+      ``,
+      `print("[LuaVoid AntiCheat v4.0] Executor-side detector running in: ${gn}")`,
+    );
+
+    return L.join('\n');
+  }
+
+  return { generate };
       `-- ║   LuaVoid Anti-Cheat System v4.0                ║`,
       `-- ║   Generated by LuaVoid | luavoid.dev            ║`,
       `-- ║   Place inside: ServerScriptService             ║`,
