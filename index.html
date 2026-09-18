@@ -141,14 +141,61 @@
 
         <!-- Right side -->
         <div class="nav-right">
+          <!-- Game Picker -->
+          <div class="game-picker-wrap" id="game-picker-wrap">
+            <button class="game-picker-btn" id="game-picker-btn">
+              <div class="gpb-thumb" id="gpb-thumb">
+                <i class="fa-brands fa-roblox"></i>
+              </div>
+              <div class="gpb-info">
+                <span class="gpb-label" id="gpb-label">Select Game</span>
+                <span class="gpb-sub" id="gpb-sub">Context for AI &amp; tools</span>
+              </div>
+              <i class="fa-solid fa-chevron-down gpb-arrow" id="gpb-arrow"></i>
+            </button>
+
+            <!-- Dropdown -->
+            <div class="game-dropdown" id="game-dropdown">
+              <div class="gd-search-wrap">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="gd-search" class="gd-search-input"
+                  placeholder="Search Roblox games..." autocomplete="off" />
+                <button class="gd-clear" id="gd-clear" style="display:none">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+              <div class="gd-status" id="gd-status">
+                <i class="fa-solid fa-magnifying-glass"></i> Type to search games
+              </div>
+              <div class="gd-results" id="gd-results"></div>
+              <div class="gd-selected-preview" id="gd-selected-preview" style="display:none">
+                <div class="gdsp-img-wrap">
+                  <img id="gdsp-img" src="" alt="" />
+                  <div class="gdsp-overlay">
+                    <button class="gdsp-apply" id="gdsp-apply-ai">
+                      <i class="fa-solid fa-wand-magic-sparkles"></i> Use in AI
+                    </button>
+                    <button class="gdsp-apply gdsp-ac" id="gdsp-apply-ac">
+                      <i class="fa-solid fa-shield-virus"></i> Anti-Cheat
+                    </button>
+                    <button class="gdsp-apply gdsp-bp" id="gdsp-apply-bp">
+                      <i class="fa-solid fa-ghost"></i> Bypass
+                    </button>
+                  </div>
+                </div>
+                <div class="gdsp-info">
+                  <div class="gdsp-name" id="gdsp-name"></div>
+                  <div class="gdsp-meta" id="gdsp-meta"></div>
+                  <div class="gdsp-desc" id="gdsp-desc"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div class="credits-display" id="credits-display">
             <i class="fa-solid fa-bolt"></i>
             <span id="credits-count">100</span>
             <span class="credits-label">credits</span>
-          </div>
-          <div class="nav-badge">
-            <span class="nb-dot"></span>
-            <span>Roblox Ready</span>
           </div>
           <button class="hamburger" id="hamburger">
             <span></span><span></span><span></span>
@@ -1119,6 +1166,7 @@
 
   <script src="js/obfuscator.js"></script>
   <script src="js/ai.js"></script>
+  <script src="js/games.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>
